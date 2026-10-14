@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Login — EventOps AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        padding: 2rem 0;
+    }
+    .login-card {
+        border: none;
+        border-radius: 2rem;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.15);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    .login-card:hover {
+        transform: translateY(-5px);
+    }
+    .login-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+        text-align: center;
+    }
+    .login-card .card-header h3 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .login-card .card-header i {
+        font-size: 2.5rem;
+        margin-bottom: 0.3rem;
+    }
+    .login-card .card-body {
+        padding: 2.5rem 2.5rem;
+    }
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    .form-floating > .form-control {
+        border-radius: 1rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.2s ease;
+        background: #f8f9fa;
+    }
+    .form-floating > .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        background: white;
+    }
+    .form-floating > label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+    .password-toggle {
+        position: absolute;
+        right: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+        z-index: 10;
+        background: transparent;
+        border: none;
+        font-size: 1.2rem;
+        transition: color 0.2s;
+    }
+    .password-toggle:hover {
+        color: #0d6efd;
+    }
+    .btn-login {
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(13, 110, 253, 0.3);
+        background: linear-gradient(135deg, #0b5ed7, #5a0fc7);
+        color: white;
+    }
+    .register-link {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    .register-link a {
+        font-weight: 600;
+        color: #0d6efd;
+        text-decoration: none;
+    }
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+    .demo-hint {
+        background: #f1f4f9;
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+        color: #495057;
+        border-left: 4px solid #0d6efd;
+    }
+    .demo-hint strong {
+        color: #0d6efd;
+    }
+    .demo-hint code {
+        background: #e9ecef;
+        padding: 0.1rem 0.5rem;
+        border-radius: 0.3rem;
+        font-size: 0.85rem;
+        color: #0d6efd;
+    }
+    @media (max-width: 576px) {
+        .login-card .card-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="col-md-8 col-lg-6 col-xl-4">
+        <div class="card login-card">
+            <div class="card-header">
+                <i class="bi bi-box-arrow-in-right"></i>
+                <h3>Welcome Back</h3>
+                <p class="mb-0" style="opacity:0.85;">Sign in to your EventOps AI account</p>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('login') }}" id="loginForm" novalidate>
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" name="email"
+                               placeholder="Email Address" required autofocus>
+                        <label for="email"><i class="bi bi-envelope-fill me-2"></i>Email Address</label>
+                        <div class="invalid-feedback">Please enter a valid email.</div>
+                    </div>
+                    <div class="form-floating position-relative">
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="Password" required>
+                        <label for="password"><i class="bi bi-lock-fill me-2"></i>Password</label>
+                        <button type="button" class="password-toggle" id="togglePassword" aria-label="Toggle password visibility">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <div class="invalid-feedback">Please enter your password.</div>
+                    </div>
+                    <button type="submit" class="btn btn-login">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                    </button>
+                </form>
+                <div class="register-link">
+                    <p class="text-muted">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+                </div>
+                <div class="demo-hint">
+                    <i class="bi bi-info-circle-fill me-2 text-primary"></i>
+                    <strong>Demo credentials:</strong><br>
+                    Admin: <code>admin@eventops.com</code> / <code>admin123</code><br>
+                    User:  <code>user@eventops.com</code> / <code>user123</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        toggleBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            const icon = this.querySelector('i');
+            icon.classList.toggle('bi-eye');
+            icon.classList.toggle('bi-eye-slash');
+        });
+        const form = document.getElementById('loginForm');
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    })();
+</script>
+{% endblock %}
