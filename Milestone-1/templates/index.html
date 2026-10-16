@@ -1,0 +1,449 @@
+{% extends "base.html" %}
+
+{% block title %}EventOps AI — Autonomous Event Intelligence{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ----- Hero Gradient ----- */
+    .hero-gradient {
+        background: linear-gradient(135deg, #0d6efd 0%, #6610f2 50%, #d63384 100%);
+        border-radius: 2rem;
+        padding: 3rem 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(13, 110, 253, 0.3);
+    }
+    .hero-gradient::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .hero-gradient .display-4 {
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .hero-gradient .lead {
+        color: rgba(255,255,255,0.9);
+    }
+    .hero-gradient .btn-outline-light {
+        border-width: 2px;
+        transition: all 0.3s ease;
+    }
+    .hero-gradient .btn-outline-light:hover {
+        background: white;
+        color: #0d6efd;
+        transform: scale(1.05);
+    }
+
+    /* ----- Animated Agent Cards ----- */
+    .agent-card {
+        border-radius: 1.5rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: none;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(4px);
+        overflow: hidden;
+        position: relative;
+    }
+    .agent-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 1.5rem;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+        pointer-events: none;
+    }
+    .agent-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    .agent-card .card-body {
+        position: relative;
+        z-index: 1;
+    }
+    .agent-card .display-4 {
+        transition: transform 0.3s ease;
+    }
+    .agent-card:hover .display-4 {
+        transform: scale(1.2) rotate(-5deg);
+    }
+
+    /* ----- Badges ----- */
+    .badge-agent {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 30px;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .badge-agent:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+    /* ----- Stats Section ----- */
+    .stats-section {
+        background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+        border-radius: 2rem;
+        padding: 2.5rem 1rem;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .stat-item {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #0d6efd;
+    }
+    .stat-label {
+        font-size: 1rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    /* ----- Carousel ----- */
+    .feature-carousel .carousel-item {
+        padding: 2rem 1rem;
+        text-align: center;
+        background: rgba(255,255,255,0.5);
+        backdrop-filter: blur(2px);
+        border-radius: 2rem;
+    }
+    .feature-carousel .carousel-control-prev,
+    .feature-carousel .carousel-control-next {
+        width: 5%;
+        background: rgba(0,0,0,0.05);
+        border-radius: 50%;
+        height: 50px;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.7;
+    }
+    .feature-carousel .carousel-control-prev:hover,
+    .feature-carousel .carousel-control-next:hover {
+        opacity: 1;
+        background: rgba(0,0,0,0.1);
+    }
+
+    /* ----- Event Cards (new) ----- */
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    }
+
+    /* ----- Responsive ----- */
+    @media (max-width: 768px) {
+        .hero-gradient {
+            padding: 2rem 1.5rem;
+            border-radius: 1.5rem;
+        }
+        .stat-item {
+            font-size: 2rem;
+        }
+    }
+
+    /* Glowing pulse for CTA */
+    .btn-glow {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(13, 110, 253, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ===== Hero Section ===== -->
+<div class="hero-gradient text-white mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-7">
+            <h1 class="display-4 fw-bold">
+                <i class="bi bi-robot me-2"></i>EventOps AI
+            </h1>
+            <p class="lead fs-3 fw-light">Autonomous Event Management Intelligence</p>
+            <p class="fs-5 mb-4" style="opacity:0.9;">
+                Agentic AI-powered event operations where specialized agents collaborate
+                to automate planning, attendee management, venue ops, speaker coordination,
+                sponsorship tracking, and incident handling — all in real time.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg btn-glow px-5">
+                        <i class="bi bi-speedometer2"></i> Go to Dashboard
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg btn-glow px-5">
+                        <i class="bi bi-person-plus"></i> Get Started Free
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-5 text-center mt-4 mt-lg-0">
+            <img src="{{ url_for('static', filename='img/event-illustration.svg') }}"
+                 alt="EventOps AI Illustration"
+                 class="img-fluid"
+                 style="max-height: 300px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));"
+                 onerror="this.style.display='none'">
+            <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
+                <span class="badge badge-agent bg-primary"><i class="bi bi-person-check me-1"></i>Registration</span>
+                <span class="badge badge-agent bg-success"><i class="bi bi-building me-1"></i>Venue</span>
+                <span class="badge badge-agent bg-warning text-dark"><i class="bi bi-mic me-1"></i>Speaker</span>
+                <span class="badge badge-agent bg-info text-dark"><i class="bi bi-trophy me-1"></i>Sponsorship</span>
+                <span class="badge badge-agent bg-danger"><i class="bi bi-exclamation-triangle me-1"></i>Incident</span>
+                <span class="badge badge-agent bg-dark"><i class="bi bi-graph-up me-1"></i>Intelligence</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Stats ===== -->
+<div class="stats-section mb-5" id="statsSection">
+    <div class="row text-center g-4">
+        <div class="col-6 col-md-3">
+            <div class="stat-item" data-count="150">0</div>
+            <div class="stat-label">Events Managed</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-item" data-count="12450">0</div>
+            <div class="stat-label">Attendees</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-item" data-count="98">0</div>
+            <div class="stat-label">Speakers</div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="stat-item" data-count="64">0</div>
+            <div class="stat-label">Sponsors</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== Agent Cards ===== -->
+<h2 class="text-center mb-4"><i class="bi bi-grid-3x3-gap-fill text-primary"></i> Intelligent Agents at Work</h2>
+<div class="row g-4 mb-5">
+    <div class="col-md-3 col-sm-6">
+        <div class="card agent-card border-0 h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-person-check display-4 text-primary"></i>
+                <h5 class="card-title mt-3 fw-bold">Registration Agent</h5>
+                <p class="card-text small text-muted">Manage registrations, ticket allocations, check-ins, and attendee analytics.</p>
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2">Active</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card agent-card border-0 h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-building display-4 text-success"></i>
+                <h5 class="card-title mt-3 fw-bold">Venue Agent</h5>
+                <p class="card-text small text-muted">Monitor utilization, room allocations, seating, and resource availability.</p>
+                <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">Optimizing</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card agent-card border-0 h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-mic display-4 text-warning"></i>
+                <h5 class="card-title mt-3 fw-bold">Speaker Agent</h5>
+                <p class="card-text small text-muted">Schedules, session planning, agenda recommendations, and performance monitoring.</p>
+                <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">Scheduling</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+        <div class="card agent-card border-0 h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-trophy display-4 text-info"></i>
+                <h5 class="card-title mt-3 fw-bold">Sponsorship Agent</h5>
+                <p class="card-text small text-muted">Track commitments, deliverables, visibility, and ROI reports.</p>
+                <span class="badge bg-info-subtle text-info rounded-pill px-3 py-2">Tracking</span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card agent-card border-0 h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-exclamation-triangle display-4 text-danger"></i>
+                <h5 class="card-title mt-3 fw-bold">Incident Agent</h5>
+                <p class="card-text small text-muted">Monitor incidents, complaints, prioritize issues, and coordinate responses.</p>
+                <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2">Alerting</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card agent-card border-0 h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up display-4 text-dark"></i>
+                <h5 class="card-title mt-3 fw-bold">Event Intelligence Engine</h5>
+                <p class="card-text small text-muted">Health scores, bottleneck prediction, optimization recommendations, agent coordination.</p>
+                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">Analyzing</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card agent-card border-0 h-100 shadow-sm">
+            <div class="card-body text-center">
+                <i class="bi bi-bell display-4 text-secondary"></i>
+                <h5 class="card-title mt-3 fw-bold">Notification & Workflow</h5>
+                <p class="card-text small text-muted">Email, SMS, push notifications, volunteer assignments, escalation workflows.</p>
+                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">Active</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== UPCOMING EVENTS (NEW) ===== -->
+<h2 class="text-center mb-4"><i class="bi bi-calendar-event text-primary"></i> Upcoming Events</h2>
+<div class="row g-4 mb-5">
+    {% if events %}
+        {% for event in events[:6] %}
+        <div class="col-md-4 col-sm-6">
+            <div class="card h-100 shadow-sm border-0 rounded-4 hover-lift">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="card-title fw-bold text-primary">{{ event.title }}</h5>
+                        <span class="badge bg-{% if event.status == 'upcoming' %}primary{% else %}success{% endif %} rounded-pill">
+                            {{ event.status|capitalize }}
+                        </span>
+                    </div>
+                    <p class="card-text small text-muted">{{ event.description[:80] }}{% if event.description|length > 80 %}…{% endif %}</p>
+                    <div class="mt-2">
+                        <div><i class="bi bi-calendar-date me-2"></i>{{ event.date }}</div>
+                        <div><i class="bi bi-clock me-2"></i>{{ event.time }}</div>
+                        <div><i class="bi bi-geo-alt me-2"></i>{{ event.location or 'TBD' }}</div>
+                        <div><i class="bi bi-people me-2"></i>Capacity: {{ event.capacity }}</div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <small class="text-muted">{{ event.registrations|length }} registered</small>
+                    <a href="{{ url_for('login') if not current_user.is_authenticated else url_for('event_detail', event_id=event.id) }}"
+                       class="btn btn-sm btn-outline-primary">
+                        {% if current_user.is_authenticated %}View Details{% else %}Login to Register{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center text-muted py-4">
+            <i class="bi bi-calendar2-x display-4 d-block mb-2"></i>
+            <h5>No upcoming events at the moment</h5>
+            <p>Check back later or <a href="{{ url_for('register') }}">sign up</a> to get notified.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- ===== Feature Carousel ===== -->
+<h2 class="text-center mb-4"><i class="bi bi-stars text-warning"></i> Platform Highlights</h2>
+<div id="featureCarousel" class="carousel slide feature-carousel mb-5" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-md-8">
+                    <i class="bi bi-robot display-3 text-primary"></i>
+                    <h4 class="mt-3">Autonomous Agent Collaboration</h4>
+                    <p class="text-muted">Six specialized AI agents work in harmony to automate every aspect of event operations, from registration to incident response.</p>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-md-8">
+                    <i class="bi bi-graph-up-arrow display-3 text-success"></i>
+                    <h4 class="mt-3">Real-time Intelligence & Analytics</h4>
+                    <p class="text-muted">Get instant event health scores, predict bottlenecks, and receive optimization recommendations powered by the Intelligence Engine.</p>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-md-8">
+                    <i class="bi bi-shield-check display-3 text-info"></i>
+                    <h4 class="mt-3">Enterprise‑Ready Deployment</h4>
+                    <p class="text-muted">Scalable, production‑ready platform with executive dashboards, multi‑event management, and end‑to‑end testing.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#featureCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#featureCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
+<!-- ===== Call to Action ===== -->
+<div class="text-center p-4 p-md-5 bg-light rounded-4 shadow-sm">
+    <h3 class="fw-bold">Ready to transform your event operations?</h3>
+    <p class="text-muted">Join the future of event management with Agentic AI.</p>
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-5">Go to Dashboard <i class="bi bi-arrow-right"></i></a>
+    {% else %}
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-5">Get Started Now <i class="bi bi-arrow-right"></i></a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ===== Animated Counter =====
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.stat-item[data-count]');
+        const speed = 200;
+
+        const animateCounter = (counter) => {
+            const target = parseInt(counter.getAttribute('data-count'));
+            const updateCounter = () => {
+                const current = parseInt(counter.innerText.replace(/,/g, ''));
+                const increment = Math.ceil(target / speed);
+                if (current < target) {
+                    counter.innerText = Math.min(current + increment, target);
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCounter();
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target;
+                    if (counter.innerText === '0') {
+                        animateCounter(counter);
+                    }
+                    observer.unobserve(counter);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(counter => observer.observe(counter));
+    });
+</script>
+{% endblock %}
