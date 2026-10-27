@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} — EventOps AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-wrapper {
+        min-height: 80vh;
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        padding: 2rem 0;
+    }
+    .detail-card {
+        border: none;
+        border-radius: 2rem;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.15);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    .detail-card:hover {
+        transform: translateY(-5px);
+    }
+    .detail-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+        text-align: center;
+    }
+    .detail-card .card-header h2 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .detail-card .card-header i {
+        font-size: 2.5rem;
+        margin-bottom: 0.3rem;
+    }
+    .detail-card .card-body {
+        padding: 2.5rem 2.5rem;
+    }
+    .status-badge {
+        font-size: 1rem;
+        padding: 0.5rem 1.5rem;
+        border-radius: 30px;
+    }
+    .detail-icon {
+        color: #0d6efd;
+        width: 1.8rem;
+        font-size: 1.2rem;
+        text-align: center;
+    }
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+        margin-right: 0.5rem;
+    }
+    .action-buttons .btn {
+        border-radius: 50px;
+        padding: 0.6rem 2rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    .action-buttons .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.10);
+    }
+    @media (max-width: 576px) {
+        .detail-card .card-body {
+            padding: 1.5rem;
+        }
+        .action-buttons .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .action-buttons .btn:last-child {
+            margin-bottom: 0;
+        }
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <div class="card detail-card">
+                    <div class="card-header">
+                        <i class="bi bi-calendar-event"></i>
+                        <h2>{{ event.title }}</h2>
+                        <p class="mb-0" style="opacity:0.85;">Event Details</p>
+                    </div>
+                    <div class="card-body">
+                        <!-- Status -->
+                        <div class="text-center mb-4">
+                            <span class="badge status-badge bg-{{ 'success' if event.status == 'upcoming' else 'warning' if event.status == 'ongoing' else 'secondary' }}">
+                                <i class="bi bi-{{ 'check-circle' if event.status == 'upcoming' else 'clock' if event.status == 'ongoing' else 'x-circle' }}"></i>
+                                {{ event.status|upper }}
+                            </span>
+                        </div>
+
+                        <!-- Description -->
+                        <p class="lead">{{ event.description }}</p>
+                        <hr>
+
+                        <!-- Details Grid -->
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <i class="bi bi-calendar-date detail-icon"></i>
+                                <span class="detail-label">Date:</span> {{ event.date }}
+                            </div>
+                            <div class="col-sm-6">
+                                <i class="bi bi-clock detail-icon"></i>
+                                <span class="detail-label">Time:</span> {{ event.time }}
+                            </div>
+                            <div class="col-sm-6">
+                                <i class="bi bi-geo-alt detail-icon"></i>
+                                <span class="detail-label">Location:</span> {{ event.location }}
+                            </div>
+                            <div class="col-sm-6">
+                                <i class="bi bi-people detail-icon"></i>
+                                <span class="detail-label">Capacity:</span> {{ event.capacity }}
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Actions -->
+                        <div class="action-buttons d-flex flex-wrap gap-3 mt-3">
+                            {% if registered %}
+                                <span class="btn btn-success disabled">
+                                    <i class="bi bi-check-circle"></i> Already Registered
+                                </span>
+                            {% elif event.status == 'upcoming' %}
+                                <a href="{{ url_for('user_register_event') }}" class="btn btn-primary">
+                                    <i class="bi bi-person-plus"></i> Register Now
+                                </a>
+                            {% else %}
+                                <span class="btn btn-secondary disabled">
+                                    <i class="bi bi-x-circle"></i> Registration Closed
+                                </span>
+                            {% endif %}
+
+                            <!-- 🔥 NEW: Rate & Feedback Button -->
+                            <a href="{{ url_for('feedback', event_id=event.id) }}" class="btn btn-outline-warning">
+                                <i class="bi bi-star"></i> Rate & Feedback
+                            </a>
+
+                            <a href="{{ url_for('browse_events') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Events
+                            </a>
+                        </div>
+
+                        <!-- Additional info for registered users -->
+                        {% if registered %}
+                        <div class="alert alert-success mt-3">
+                            <i class="bi bi-info-circle"></i> You are registered for this event. Check your <a href="{{ url_for('user_my_registrations') }}" class="alert-link">registrations</a> for details.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
