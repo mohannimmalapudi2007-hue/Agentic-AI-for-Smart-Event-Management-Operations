@@ -1,0 +1,118 @@
+
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy — EventOps AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .privacy-hero {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 1.5rem;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .privacy-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+    }
+
+    .privacy-card h3 {
+        color: #0d6efd;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .privacy-card p,
+    .privacy-card li {
+        color: #495057;
+        line-height: 1.8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+    <div class="privacy-hero">
+        <i class="bi bi-shield-lock fs-1"></i>
+        <h1 class="fw-bold mt-3">Privacy Policy</h1>
+        <p class="mb-0">
+            Your privacy matters to EventOps AI.
+        </p>
+    </div>
+
+    <div class="privacy-card">
+        <h3>1. Introduction</h3>
+        <p>
+            This Privacy Policy explains how EventOps AI handles
+            information when you use our event management platform.
+        </p>
+    </div>
+
+    <div class="privacy-card">
+        <h3>2. Information We Handle</h3>
+        <p>
+            Depending on the features you use, the platform may
+            process information such as your name, email address,
+            account details, event registrations, and messages
+            submitted through our contact form.
+        </p>
+    </div>
+
+    <div class="privacy-card">
+        <h3>3. How Information Is Used</h3>
+        <ul>
+            <li>To create and manage user accounts.</li>
+            <li>To manage event registrations and participation.</li>
+            <li>To provide platform features and support.</li>
+            <li>To maintain the security and reliability of the service.</li>
+        </ul>
+    </div>
+
+    <div class="privacy-card">
+        <h3>4. Data Security</h3>
+        <p>
+            We aim to protect information using appropriate security
+            measures. No method of electronic storage or transmission
+            can be guaranteed to be completely secure.
+        </p>
+    </div>
+
+    <div class="privacy-card">
+        <h3>5. Sharing of Information</h3>
+        <p>
+            Information should only be shared when necessary to
+            operate the platform, comply with applicable law, or
+            with appropriate authorization. The actual practices
+            depend on the platform's implementation.
+        </p>
+    </div>
+
+    <div class="privacy-card">
+        <h3>6. Your Choices</h3>
+        <p>
+            You may contact the platform administrator to ask about
+            your information, request corrections, or raise privacy
+            concerns, subject to applicable law.
+        </p>
+    </div>
+
+    <div class="privacy-card">
+        <h3>7. Contact Us</h3>
+        <p>
+            If you have questions about this policy, please visit
+            our Contact page.
+        </p>
+        <a href="{{ url_for('contact') }}" class="btn btn-primary rounded-pill px-4">
+            <i class="bi bi-envelope me-2"></i>Contact Us
+        </a>
+    </div>
+
+</div>
+{% endblock %}

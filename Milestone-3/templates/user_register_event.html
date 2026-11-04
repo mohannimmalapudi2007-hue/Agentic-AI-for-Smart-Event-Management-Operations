@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Register for Event — EventOps AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        padding: 2rem 0;
+    }
+    .register-card {
+        border: none;
+        border-radius: 2rem;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.15);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    .register-card:hover {
+        transform: translateY(-5px);
+    }
+    .register-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+        text-align: center;
+    }
+    .register-card .card-header h3 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .register-card .card-header i {
+        font-size: 2.5rem;
+        margin-bottom: 0.3rem;
+    }
+    .register-card .card-body {
+        padding: 2.5rem 2.5rem;
+    }
+
+    /* ---- Form fields ---- */
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        border-radius: 1rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.2s ease;
+        background: #f8f9fa;
+    }
+    .form-floating > .form-control:focus,
+    .form-floating > .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        background: white;
+    }
+    .form-floating > label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    /* ---- Event Preview Card ---- */
+    .event-preview {
+        background: #f8f9fa;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        border: 2px dashed #dee2e6;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    .event-preview.has-event {
+        border-style: solid;
+        border-color: #0d6efd;
+        background: #e7f0ff;
+    }
+    .event-preview .event-placeholder {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+    .event-preview .event-details {
+        display: none;
+        width: 100%;
+    }
+    .event-preview.has-event .event-placeholder {
+        display: none;
+    }
+    .event-preview.has-event .event-details {
+        display: block;
+    }
+    .event-preview .event-title {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #0d6efd;
+    }
+    .event-preview .event-meta {
+        font-size: 0.9rem;
+        color: #495057;
+        margin-top: 0.3rem;
+    }
+    .event-preview .event-meta i {
+        margin-right: 0.3rem;
+        color: #6c757d;
+    }
+
+    /* ---- Ticket Cards (new) ---- */
+    .ticket-option {
+        text-align: center;
+        padding: 0.75rem 0.5rem;
+        border: 2px solid #dee2e6;
+        border-radius: 1rem;
+        background: white;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        width: 100%;
+        font-weight: 500;
+    }
+    .ticket-option i {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 0.3rem;
+    }
+    .ticket-option:hover {
+        border-color: #0d6efd;
+        background: #f0f7ff;
+    }
+    .ticket-option.selected {
+        border-color: #0d6efd;
+        background: #e7f0ff;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .btn-check:checked + .ticket-option {
+        border-color: #0d6efd;
+        background: #e7f0ff;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    /* Hide the actual radio button */
+    .btn-check {
+        position: absolute;
+        clip: rect(0,0,0,0);
+        pointer-events: none;
+    }
+
+    /* ---- Submit button ---- */
+    .btn-register {
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    .btn-register:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(13, 110, 253, 0.3);
+        background: linear-gradient(135deg, #0b5ed7, #5a0fc7);
+        color: white;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 576px) {
+        .register-card .card-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-wrapper">
+    <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card register-card">
+            <div class="card-header">
+                <i class="bi bi-calendar-plus"></i>
+                <h3>Register for an Event</h3>
+                <p class="mb-0" style="opacity:0.85;">Secure your spot at the next big event</p>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('user_register_event') }}" id="registerForm">
+                    <!-- Event Selection -->
+                    <div class="form-floating">
+                        <select class="form-select" id="event_id" name="event_id" required>
+                            <option value="">-- Choose an event --</option>
+                            {% for event in events %}
+                                <option value="{{ event.id }}"
+                                        data-title="{{ event.title }}"
+                                        data-date="{{ event.date }}"
+                                        data-time="{{ event.time }}"
+                                        data-location="{{ event.location }}"
+                                        data-capacity="{{ event.capacity }}">
+                                    {{ event.title }} ({{ event.date }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <label for="event_id"><i class="bi bi-calendar-event me-2"></i>Select Event</label>
+                    </div>
+
+                    <!-- Event Preview (updates dynamically) -->
+                    <div class="event-preview" id="eventPreview">
+                        <div class="event-placeholder">
+                            <i class="bi bi-info-circle me-1"></i> Select an event to see details
+                        </div>
+                        <div class="event-details">
+                            <div class="event-title" id="previewTitle">Event Title</div>
+                            <div class="event-meta">
+                                <span id="previewDate"><i class="bi bi-calendar-date"></i> Date</span>
+                                <span class="mx-2">·</span>
+                                <span id="previewTime"><i class="bi bi-clock"></i> Time</span>
+                            </div>
+                            <div class="event-meta">
+                                <span id="previewLocation"><i class="bi bi-geo-alt"></i> Location</span>
+                                <span class="mx-2">·</span>
+                                <span id="previewCapacity"><i class="bi bi-people"></i> Capacity: </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ticket Type – now visual cards -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold"><i class="bi bi-ticket-perforated me-2"></i>Choose Ticket Type</label>
+                        <div class="row g-2">
+                            <div class="col-6 col-md-3">
+                                <input type="radio" class="btn-check" name="ticket_type" value="Standard" id="ticket_standard" checked>
+                                <label class="ticket-option" for="ticket_standard">
+                                    <i class="bi bi-ticket text-primary"></i>
+                                    Standard
+                                </label>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <input type="radio" class="btn-check" name="ticket_type" value="VIP" id="ticket_vip">
+                                <label class="ticket-option" for="ticket_vip">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    VIP
+                                </label>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <input type="radio" class="btn-check" name="ticket_type" value="Speaker" id="ticket_speaker">
+                                <label class="ticket-option" for="ticket_speaker">
+                                    <i class="bi bi-mic text-info"></i>
+                                    Speaker
+                                </label>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <input type="radio" class="btn-check" name="ticket_type" value="Press" id="ticket_press">
+                                <label class="ticket-option" for="ticket_press">
+                                    <i class="bi bi-newspaper text-secondary"></i>
+                                    Press
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn btn-register">
+                        <i class="bi bi-check-circle me-2"></i> Register Now
+                    </button>
+                </form>
+
+                <!-- Cancel link -->
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('dashboard') }}" class="text-decoration-none text-muted">
+                        <i class="bi bi-arrow-left"></i> Cancel and go back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        const select = document.getElementById('event_id');
+        const preview = document.getElementById('eventPreview');
+
+        function updatePreview() {
+            const selectedOption = select.options[select.selectedIndex];
+            if (!selectedOption || !selectedOption.value) {
+                preview.classList.remove('has-event');
+                return;
+            }
+
+            const title = selectedOption.getAttribute('data-title') || 'Untitled';
+            const date = selectedOption.getAttribute('data-date') || 'TBD';
+            const time = selectedOption.getAttribute('data-time') || 'TBD';
+            const location = selectedOption.getAttribute('data-location') || 'TBD';
+            const capacity = selectedOption.getAttribute('data-capacity') || 'N/A';
+
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewDate').innerHTML = '<i class="bi bi-calendar-date"></i> ' + date;
+            document.getElementById('previewTime').innerHTML = '<i class="bi bi-clock"></i> ' + time;
+            document.getElementById('previewLocation').innerHTML = '<i class="bi bi-geo-alt"></i> ' + location;
+            document.getElementById('previewCapacity').innerHTML = '<i class="bi bi-people"></i> Capacity: ' + capacity;
+
+            preview.classList.add('has-event');
+        }
+
+        select.addEventListener('change', updatePreview);
+
+        if (select.value) {
+            updatePreview();
+        }
+
+        // Form validation
+        const form = document.getElementById('registerForm');
+        form.addEventListener('submit', function(e) {
+            if (!select.value) {
+                e.preventDefault();
+                alert('Please select an event.');
+                select.focus();
+            }
+        });
+
+        // Optional: highlight selected ticket card (Bootstrap's .btn-check already handles it, but we add a class for custom styling)
+        document.querySelectorAll('.btn-check').forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.ticket-option').forEach(function(label) {
+                    label.classList.remove('selected');
+                });
+                if (this.checked) {
+                    this.nextElementSibling.classList.add('selected');
+                }
+            });
+        });
+        // Trigger initial selected state
+        document.querySelector('.btn-check:checked')?.nextElementSibling?.classList.add('selected');
+    })();
+</script>
+{% endblock %}

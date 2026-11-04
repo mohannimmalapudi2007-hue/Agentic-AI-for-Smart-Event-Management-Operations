@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}About Us — EventOps AI{% endblock %}
+{% block extra_css %}
+<style>
+    .about-hover-box {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+    }
+
+    .about-hover-box:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        z-index: 2;
+    }
+
+    .card {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+    }
+
+    .card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        z-index: 2;
+    }
+
+    .bg-white.rounded-3 {
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .bg-white.rounded-3:hover {
+        transform: translateY(-6px) scale(1.04);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12) !important;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+        <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill mb-3">
+            <i class="bi bi-robot me-1"></i> About Our Platform
+        </span>
+
+        <h1 class="display-4 fw-bold">
+            About <span class="text-primary">EventOps AI</span>
+        </h1>
+
+        <p class="lead text-muted mt-3 mx-auto" style="max-width: 850px;">
+            Intelligent event management powered by Agentic AI,
+            designed to simplify planning, automate operations,
+            and deliver exceptional event experiences.
+        </p>
+    </div>
+
+    <!-- About Project -->
+    <div class="row align-items-center g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="p-4 p-md-5 bg-light rounded-4 shadow-sm h-100 about-hover-box">
+                <h2 class="fw-bold mb-3">
+                    <i class="bi bi-lightbulb text-primary me-2"></i>
+                    Our Project
+                </h2>
+
+                <p class="text-muted">
+                    EventOps AI is an Agent-powered event management
+                    platform developed to streamline the planning,
+                    execution, and monitoring of large-scale events
+                    such as conferences, hackathons, exhibitions,
+                    and corporate summits.
+                </p>
+
+                <p class="text-muted mb-0">
+                    The platform brings event operations together
+                    in one place, helping organisers manage
+                    registrations, venues, speakers, sponsorships,
+                    and incidents while providing analytics and
+                    intelligent recommendations.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="p-4 p-md-5 rounded-4 text-white h-100 about-hover-box"
+                 style="background: linear-gradient(135deg, #0d6efd, #6610f2, #d63384);">
+
+                <i class="bi bi-bullseye display-3 mb-3"></i>
+
+                <h2 class="fw-bold">Our Mission</h2>
+
+                <p class="fs-5 mb-0">
+                    To make event management smarter and more
+                    efficient through automation, collaborative
+                    AI agents, real-time insights, and better
+                    decision-making.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Features -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">What Makes Us Different?</h2>
+        <p class="text-muted">
+            Specialised AI agents working together as one platform.
+        </p>
+    </div>
+
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <i class="bi bi-person-check display-5 text-primary"></i>
+                    <h5 class="fw-bold mt-3">Smart Registration</h5>
+                    <p class="text-muted mb-0">
+                        Simplifies attendee registration, ticket
+                        management, check-ins, and attendance tracking.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <i class="bi bi-building display-5 text-success"></i>
+                    <h5 class="fw-bold mt-3">Venue Optimisation</h5>
+                    <p class="text-muted mb-0">
+                        Helps monitor room capacity, venue utilisation,
+                        seating arrangements, and resource availability.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <i class="bi bi-mic display-5 text-warning"></i>
+                    <h5 class="fw-bold mt-3">Speaker Coordination</h5>
+                    <p class="text-muted mb-0">
+                        Supports speaker scheduling, availability
+                        tracking, session planning, and conflict detection.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <i class="bi bi-trophy display-5 text-info"></i>
+                    <h5 class="fw-bold mt-3">Sponsorship Tracking</h5>
+                    <p class="text-muted mb-0">
+                        Organises sponsor commitments, deliverables,
+                        visibility metrics, and return-on-investment
+                        tracking.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <i class="bi bi-exclamation-triangle display-5 text-danger"></i>
+                    <h5 class="fw-bold mt-3">Incident Management</h5>
+                    <p class="text-muted mb-0">
+                        Helps record operational issues, prioritise
+                        incidents, coordinate responses, and support
+                        escalation workflows.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <i class="bi bi-graph-up-arrow display-5 text-primary"></i>
+                    <h5 class="fw-bold mt-3">Event Intelligence</h5>
+                    <p class="text-muted mb-0">
+                        Combines operational information to calculate
+                        event health scores, identify potential
+                        bottlenecks, and recommend improvements.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="bg-light rounded-4 p-4 p-md-5 mb-5">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold">Technology Stack</h2>
+            <p class="text-muted">
+                Technologies used to build the EventOps AI platform.
+            </p>
+        </div>
+
+        <div class="row g-3 text-center">
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
+                    <i class="bi bi-code-slash fs-2 text-primary"></i>
+                    <h6 class="fw-bold mt-2">Python</h6>
+                    <small class="text-muted">Backend Language</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
+                    <i class="bi bi-server fs-2 text-success"></i>
+                    <h6 class="fw-bold mt-2">Flask</h6>
+                    <small class="text-muted">Web Framework</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
+                    <i class="bi bi-database fs-2 text-info"></i>
+                    <h6 class="fw-bold mt-2">SQLite</h6>
+                    <small class="text-muted">Database</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
+                    <i class="bi bi-robot fs-2 text-danger"></i>
+                    <h6 class="fw-bold mt-2">Google Gemini</h6>
+                    <small class="text-muted">AI Assistant</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
+                    <i class="bi bi-window fs-2 text-primary"></i>
+                    <h6 class="fw-bold mt-2">HTML & CSS</h6>
+                    <small class="text-muted">Frontend</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
+                    <i class="bi bi-bootstrap fs-2 text-primary"></i>
+                    <h6 class="fw-bold mt-2">Bootstrap 5</h6>
+                    <small class="text-muted">Responsive UI</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
+                    <i class="bi bi-bar-chart fs-2 text-success"></i>
+                    <h6 class="fw-bold mt-2">Chart.js</h6>
+                    <small class="text-muted">Data Visualisation</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="bg-white rounded-3 p-3 shadow-sm h-100">
+                    <i class="bi bi-lightning fs-2 text-warning"></i>
+                    <h6 class="fw-bold mt-2">JavaScript</h6>
+                    <small class="text-muted">Interactive Features</small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Closing Section -->
+    <div class="text-center p-4 p-md-5 rounded-4 text-white"
+         style="background: linear-gradient(135deg, #0d6efd, #6610f2);">
+
+        <i class="bi bi-calendar2-check display-4 mb-3"></i>
+
+        <h2 class="fw-bold">Smarter Events Start Here</h2>
+
+        <p class="lead mb-4">
+            Experience a more organized and intelligent approach
+            to event management with EventOps AI.
+        </p>
+
+        <a href="{{ url_for('index') }}"
+           class="btn btn-light btn-lg px-4">
+            <i class="bi bi-house me-2"></i>Back to Home
+        </a>
+
+        <a href="{{ url_for('register') }}"
+           class="btn btn-outline-light btn-lg px-4 ms-2">
+            Get Started
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

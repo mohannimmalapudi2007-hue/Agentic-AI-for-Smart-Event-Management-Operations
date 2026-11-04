@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+
+{% block title %}{% if event %}Edit{% else %}Add{% endif %} Event{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        overflow: hidden;
+        background: white;
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+    }
+    .form-card .card-header h4 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .form-card .card-body {
+        padding: 2rem 2.5rem;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #2d3748;
+    }
+    .form-label i {
+        margin-right: 0.5rem;
+        color: #667eea;
+    }
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
+        background: #f7fafc;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102,126,234,0.25);
+        background: white;
+    }
+    .form-control-color {
+        padding: 0.25rem;
+        height: 50px;
+    }
+    .input-group-text {
+        background: #f7fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.75rem 0 0 0.75rem;
+        font-weight: 500;
+    }
+    .input-group .form-control {
+        border-radius: 0 0.75rem 0.75rem 0;
+        border-left: none;
+    }
+    .capacity-slider {
+        width: 100%;
+        accent-color: #667eea;
+    }
+    .capacity-value {
+        font-weight: 700;
+        color: #667eea;
+        font-size: 1.2rem;
+        margin-left: 0.5rem;
+    }
+    .preview-card {
+        background: #f7fafc;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        border: 2px dashed #cbd5e0;
+        transition: all 0.3s ease;
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #a0aec0;
+        text-align: center;
+    }
+    .preview-card.has-content {
+        border-style: solid;
+        border-color: #667eea;
+        background: #edf2f7;
+        color: #2d3748;
+    }
+    .preview-card .preview-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+    }
+    .preview-card .preview-meta {
+        font-size: 0.9rem;
+        color: #4a5568;
+        margin-top: 0.3rem;
+    }
+    .preview-card .preview-meta i {
+        margin-right: 0.3rem;
+        color: #667eea;
+    }
+    .preview-card .preview-badge {
+        display: inline-block;
+        padding: 0.25rem 1rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-top: 0.5rem;
+    }
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(102,126,234,0.4);
+        color: white;
+    }
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+    .btn-submit i {
+        margin-right: 0.5rem;
+    }
+    .image-upload-wrapper {
+        border: 2px dashed #cbd5e0;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #f7fafc;
+    }
+    .image-upload-wrapper:hover {
+        border-color: #667eea;
+        background: #edf2f7;
+    }
+    .image-upload-wrapper i {
+        font-size: 2.5rem;
+        color: #a0aec0;
+    }
+    .image-upload-wrapper .upload-text {
+        color: #4a5568;
+        margin-top: 0.5rem;
+    }
+    .image-upload-wrapper input[type="file"] {
+        display: none;
+    }
+    .image-preview {
+        max-width: 100%;
+        max-height: 150px;
+        border-radius: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    @media (max-width: 576px) {
+        .form-card .card-body { padding: 1.5rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card form-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0"><i class="bi bi-calendar-plus"></i> {% if event %}Edit Event{% else %}Create New Event{% endif %}</h4>
+                            <small>Fill in the details below. Fields with * are required.</small>
+                        </div>
+                        <span class="badge bg-light text-dark px-3 py-2">
+                            {% if event %}ID: {{ event.id }}{% else %}New{% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="eventForm">
+                        <!-- Hidden field for edit mode -->
+                        {% if event %}<input type="hidden" name="_method" value="PUT">{% endif %}
+
+                        <div class="row g-4">
+                            <!-- Left Column -->
+                            <div class="col-md-7">
+                                <!-- Title -->
+                                <div class="mb-3">
+                                    <label for="title" class="form-label"><i class="bi bi-tag"></i> Event Title *</label>
+                                    <input type="text" class="form-control" id="title" name="title" 
+                                           value="{{ event.title if event else '' }}" 
+                                           placeholder="e.g., AI Summit 2026" required>
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    <label for="description" class="form-label"><i class="bi bi-text-paragraph"></i> Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="4" 
+                                              placeholder="Describe your event…">{{ event.description if event else '' }}</textarea>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="date" class="form-label"><i class="bi bi-calendar-date"></i> Date *</label>
+                                        <input type="date" class="form-control" id="date" name="date" 
+                                               value="{{ event.date if event else '' }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="time" class="form-label"><i class="bi bi-clock"></i> Time *</label>
+                                        <input type="time" class="form-control" id="time" name="time" 
+                                               value="{{ event.time if event else '' }}" required>
+                                    </div>
+                                </div>
+
+                                <!-- Location & Capacity -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="location" class="form-label"><i class="bi bi-geo-alt"></i> Location</label>
+                                        <input type="text" class="form-control" id="location" name="location" 
+                                               value="{{ event.location if event else '' }}" 
+                                               placeholder="e.g., Main Hall, Room 101">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="capacity" class="form-label"><i class="bi bi-people"></i> Capacity</label>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <input type="range" class="capacity-slider" id="capacitySlider" 
+                                                   name="capacity" min="0" max="1000" step="10" 
+                                                   value="{{ event.capacity if event else 100 }}">
+                                            <span class="capacity-value" id="capacityDisplay">{{ event.capacity if event else 100 }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Status -->
+                                <div class="mb-3">
+                                    <label for="status" class="form-label"><i class="bi bi-check-circle"></i> Status</label>
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="upcoming" {% if event and event.status == 'upcoming' %}selected{% endif %}>🔵 Upcoming</option>
+                                        <option value="ongoing" {% if event and event.status == 'ongoing' %}selected{% endif %}>🟢 Ongoing</option>
+                                        <option value="completed" {% if event and event.status == 'completed' %}selected{% endif %}>⚪ Completed</option>
+                                        <option value="cancelled" {% if event and event.status == 'cancelled' %}selected{% endif %}>🔴 Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Right Column (Preview & Image) -->
+                            <div class="col-md-5">
+                                <!-- Image Upload (placeholder) -->
+                                <div class="mb-3">
+                                    <label class="form-label"><i class="bi bi-image"></i> Event Banner</label>
+                                    <div class="image-upload-wrapper" id="imageUploadWrapper">
+                                        <i class="bi bi-cloud-upload"></i>
+                                        <div class="upload-text">Click or drag to upload image</div>
+                                        <input type="file" id="imageInput" accept="image/*">
+                                        <img id="imagePreview" class="image-preview" style="display:none;" alt="Preview">
+                                    </div>
+                                </div>
+
+                                <!-- Live Preview -->
+                                <div class="preview-card" id="previewCard">
+                                    <div class="preview-placeholder">
+                                        <i class="bi bi-eye" style="font-size:2rem;"></i>
+                                        <p>Live Preview</p>
+                                    </div>
+                                    <div class="preview-content" style="display:none; width:100%;">
+                                        <div class="preview-title" id="previewTitle">Event Title</div>
+                                        <div class="preview-meta">
+                                            <span id="previewDate"><i class="bi bi-calendar-date"></i> Date</span>
+                                            <span class="mx-2">·</span>
+                                            <span id="previewTime"><i class="bi bi-clock"></i> Time</span>
+                                        </div>
+                                        <div class="preview-meta">
+                                            <span id="previewLocation"><i class="bi bi-geo-alt"></i> Location</span>
+                                            <span class="mx-2">·</span>
+                                            <span id="previewCapacity"><i class="bi bi-people"></i> Capacity: </span>
+                                        </div>
+                                        <span class="preview-badge" id="previewStatusBadge">🟢 Upcoming</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn btn-submit">
+                                <i class="bi bi-check-circle"></i> {% if event %}Update Event{% else %}Create Event{% endif %}
+                            </button>
+                            <a href="{{ url_for('admin_events') }}" class="btn btn-outline-secondary btn-lg px-4">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        // ---- Capacity Slider ----
+        const slider = document.getElementById('capacitySlider');
+        const display = document.getElementById('capacityDisplay');
+        if (slider && display) {
+            slider.addEventListener('input', function() {
+                display.textContent = this.value;
+            });
+        }
+
+        // ---- Live Preview ----
+        const titleInput = document.getElementById('title');
+        const dateInput = document.getElementById('date');
+        const timeInput = document.getElementById('time');
+        const locationInput = document.getElementById('location');
+        const capacitySlider = document.getElementById('capacitySlider');
+        const statusSelect = document.getElementById('status');
+        const previewCard = document.getElementById('previewCard');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewDate = document.getElementById('previewDate');
+        const previewTime = document.getElementById('previewTime');
+        const previewLocation = document.getElementById('previewLocation');
+        const previewCapacity = document.getElementById('previewCapacity');
+        const previewStatusBadge = document.getElementById('previewStatusBadge');
+        const placeholder = previewCard.querySelector('.preview-placeholder');
+        const content = previewCard.querySelector('.preview-content');
+
+        function updatePreview() {
+            const title = titleInput.value.trim() || 'Untitled Event';
+            const date = dateInput.value || 'TBD';
+            const time = timeInput.value || 'TBD';
+            const location = locationInput.value || 'TBD';
+            const capacity = capacitySlider ? capacitySlider.value : '0';
+            const status = statusSelect ? statusSelect.options[statusSelect.selectedIndex].text : 'Upcoming';
+            const statusValue = statusSelect ? statusSelect.value : 'upcoming';
+
+            previewTitle.textContent = title;
+            previewDate.innerHTML = `<i class="bi bi-calendar-date"></i> ${date}`;
+            previewTime.innerHTML = `<i class="bi bi-clock"></i> ${time}`;
+            previewLocation.innerHTML = `<i class="bi bi-geo-alt"></i> ${location}`;
+            previewCapacity.innerHTML = `<i class="bi bi-people"></i> Capacity: ${capacity}`;
+
+            // Status badge color
+            let badgeColor = 'bg-primary';
+            if (statusValue === 'upcoming') badgeColor = 'bg-primary';
+            else if (statusValue === 'ongoing') badgeColor = 'bg-success';
+            else if (statusValue === 'completed') badgeColor = 'bg-secondary';
+            else if (statusValue === 'cancelled') badgeColor = 'bg-danger';
+            previewStatusBadge.className = `preview-badge ${badgeColor}`;
+            previewStatusBadge.textContent = status;
+
+            // Show content, hide placeholder
+            placeholder.style.display = 'none';
+            content.style.display = 'block';
+            previewCard.classList.add('has-content');
+        }
+
+        // Attach events
+        const inputs = [titleInput, dateInput, timeInput, locationInput, capacitySlider, statusSelect];
+        inputs.forEach(input => {
+            if (input) input.addEventListener('input', updatePreview);
+            if (input && input.tagName === 'SELECT') input.addEventListener('change', updatePreview);
+        });
+
+        // Initial preview
+        updatePreview();
+
+        // ---- Image Upload (preview) ----
+        const imageUploadWrapper = document.getElementById('imageUploadWrapper');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imageUploadWrapper.addEventListener('click', function() {
+            imageInput.click();
+        });
+
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    imagePreview.src = ev.target.result;
+                    imagePreview.style.display = 'block';
+                    imageUploadWrapper.querySelector('i').style.display = 'none';
+                    imageUploadWrapper.querySelector('.upload-text').textContent = 'Image uploaded ✓';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Drag and drop support (basic)
+        imageUploadWrapper.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#667eea';
+        });
+        imageUploadWrapper.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#cbd5e0';
+        });
+        imageUploadWrapper.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#cbd5e0';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                imageInput.files = files;
+                imageInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Form validation (ensure required fields)
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            const title = document.getElementById('title').value.trim();
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            if (!title || !date || !time) {
+                e.preventDefault();
+                alert('Please fill in all required fields: Title, Date, and Time.');
+            }
+        });
+
+    })();
+</script>
+{% endblock %}

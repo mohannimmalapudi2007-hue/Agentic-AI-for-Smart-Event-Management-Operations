@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if venue else 'Add' }} Venue — Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        border-radius: 2rem;
+    }
+    .form-card {
+        border: none;
+        border-radius: 2rem;
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(4px);
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.12);
+        overflow: hidden;
+        transition: transform 0.3s;
+    }
+    .form-card:hover {
+        transform: translateY(-5px);
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+        text-align: center;
+    }
+    .form-card .card-header h3 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .form-card .card-header i {
+        font-size: 2.5rem;
+        margin-bottom: 0.3rem;
+    }
+    .form-card .card-body {
+        padding: 2.5rem 2.5rem;
+    }
+
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        border-radius: 1rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.2s ease;
+        background: #f8f9fa;
+    }
+    .form-floating > .form-control:focus,
+    .form-floating > .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        background: white;
+    }
+    .form-floating > label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .btn-save {
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    .btn-save:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(13,110,253,0.3);
+        background: linear-gradient(135deg, #0b5ed7, #5a0fc7);
+        color: white;
+    }
+
+    @media (max-width: 576px) {
+        .form-card .card-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card form-card">
+            <div class="card-header">
+                <i class="bi bi-{{ 'pencil-square' if venue else 'building-add' }}"></i>
+                <h3>{{ 'Edit' if venue else 'Add' }} Venue</h3>
+                <p class="mb-0" style="opacity:0.85;">{{ 'Update' if venue else 'Create a new' }} venue for your events</p>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <!-- Name -->
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="name" name="name"
+                               value="{{ venue.name if venue else '' }}" placeholder="Venue name" required>
+                        <label for="name"><i class="bi bi-building me-2"></i>Venue Name</label>
+                    </div>
+
+                    <!-- Capacity -->
+                    <div class="form-floating">
+                        <input type="number" class="form-control" id="capacity" name="capacity"
+                               value="{{ venue.capacity if venue else '' }}" placeholder="Capacity" min="1">
+                        <label for="capacity"><i class="bi bi-people me-2"></i>Capacity</label>
+                    </div>
+
+                    <!-- Utilization (only for edit) -->
+                    {% if venue %}
+                    <div class="form-floating">
+                        <input type="number" step="0.1" class="form-control" id="utilization" name="utilization"
+                               value="{{ venue.utilization if venue else 0 }}" placeholder="Utilization" min="0" max="100">
+                        <label for="utilization"><i class="bi bi-graph-up me-2"></i>Utilization (%)</label>
+                    </div>
+                    {% endif %}
+
+                    <!-- Status -->
+                    <div class="form-floating">
+                        <select class="form-select" id="status" name="status">
+                            <option value="available" {% if venue and venue.status == 'available' %}selected{% endif %}>Available</option>
+                            <option value="occupied" {% if venue and venue.status == 'occupied' %}selected{% endif %}>Occupied</option>
+                            <option value="maintenance" {% if venue and venue.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                        </select>
+                        <label for="status"><i class="bi bi-toggle-on me-2"></i>Status</label>
+                    </div>
+
+                    <!-- Buttons -->
+                    <button type="submit" class="btn btn-save">
+                        <i class="bi bi-check-circle me-2"></i> {{ 'Update' if venue else 'Create' }} Venue
+                    </button>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('admin_venues') }}" class="text-decoration-none text-muted">
+                            <i class="bi bi-arrow-left"></i> Cancel and go back
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
