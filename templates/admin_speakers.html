@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Admin — Speakers{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        padding: 2rem 0;
+        border-radius: 2rem;
+    }
+    .admin-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.10);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(4px);
+        overflow: hidden;
+    }
+    .admin-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.2rem 1.5rem;
+        border: none;
+    }
+    .admin-card .card-header h2 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .admin-card .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Stats row */
+    .stats-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 1rem;
+        padding: 1rem;
+    }
+    .stats-row .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .stats-row .stat-item i {
+        font-size: 1.2rem;
+        color: #0d6efd;
+    }
+    .stats-row .stat-item .stat-num {
+        font-weight: 700;
+        color: #0d6efd;
+        font-size: 1.1rem;
+        margin: 0 0.3rem;
+    }
+
+    /* Search */
+    .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+    .filter-bar .search-box {
+        flex: 1;
+        min-width: 200px;
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.2s;
+        background: white;
+    }
+    .filter-bar .search-box:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        outline: none;
+    }
+    .filter-bar .filter-select {
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem 1.2rem;
+        background: white;
+        transition: all 0.2s;
+        min-width: 140px;
+    }
+    .filter-bar .filter-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        outline: none;
+    }
+
+    /* Table */
+    .table-hover tbody tr {
+        transition: all 0.2s ease;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #e7f0ff !important;
+    }
+    .badge-status {
+        padding: 0.3rem 0.9rem;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+    .btn-outline-primary,
+    .btn-outline-warning,
+    .btn-outline-danger {
+        border-radius: 30px;
+        transition: all 0.2s;
+    }
+    .btn-outline-primary:hover,
+    .btn-outline-warning:hover,
+    .btn-outline-danger:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .total-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 0.2rem 1rem;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+    .session-preview {
+        font-size: 0.85rem;
+        color: #495057;
+        max-width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    @media (max-width: 576px) {
+        .admin-card .card-body {
+            padding: 1rem;
+        }
+        .table {
+            font-size: 0.85rem;
+        }
+        .stats-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .filter-bar {
+            flex-direction: column;
+        }
+        .filter-bar .search-box,
+        .filter-bar .filter-select {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <div class="container-fluid">
+        <div class="card admin-card">
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <h2 class="mb-0"><i class="bi bi-mic me-2"></i>Speakers Management</h2>
+                <div>
+                    <span class="total-badge"><i class="bi bi-database"></i> Total: {{ speakers|length }}</span>
+                    <a href="{{ url_for('admin_speaker_add') }}" class="btn btn-light btn-sm ms-2">
+                        <i class="bi bi-plus-circle"></i> Add Speaker
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-item"><i class="bi bi-mic"></i> Total: <span class="stat-num">{{ speakers|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-check-circle text-success"></i> Available: <span class="stat-num">{{ speakers|selectattr('availability', 'equalto', True)|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-x-circle text-danger"></i> Unavailable: <span class="stat-num">{{ speakers|selectattr('availability', 'equalto', False)|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-calendar-event text-info"></i> Sessions: <span class="stat-num">{{ speakers|map(attribute='session_title')|select('!=', None)|list|length }}</span></div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                    <input type="text" id="searchSpeaker" class="search-box" placeholder="🔍 Search by name or session...">
+                    <select id="filterAvailability" class="filter-select">
+                        <option value="">All availability</option>
+                        <option value="true">Available</option>
+                        <option value="false">Unavailable</option>
+                    </select>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="speakerTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Session</th>
+                                <th>Schedule</th>
+                                <th>Available</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for speaker in speakers %}
+                            <tr data-name="{{ speaker.name|lower }}"
+                                data-session="{{ speaker.session_title|lower if speaker.session_title else '' }}"
+                                data-available="{{ speaker.availability|string|lower }}">
+                                <td>{{ speaker.id }}</td>
+                                <td><strong>{{ speaker.name }}</strong></td>
+                                <td>
+                                    <div class="session-preview" title="{{ speaker.session_title or 'No session' }}">
+                                        {{ speaker.session_title or '—' }}
+                                    </div>
+                                </td>
+                                <td>{{ speaker.schedule or '—' }}</td>
+                                <td>
+                                    <span class="badge-status bg-{{ 'success' if speaker.availability else 'danger' }}">
+                                        {{ 'Yes' if speaker.availability else 'No' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin_speaker_edit', speaker_id=speaker.id) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{{ url_for('admin_speaker_delete', speaker_id=speaker.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this speaker?')"><i class="bi bi-trash"></i></a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-mic-mute fs-1 d-block mb-2"></i>
+                                    No speakers yet. Click "Add Speaker" to create one.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchSpeaker');
+        const filterAvail = document.getElementById('filterAvailability');
+        const rows = document.querySelectorAll('#speakerTable tbody tr');
+
+        function filterTable() {
+            const query = searchInput.value.toLowerCase().trim();
+            const availVal = filterAvail.value;
+
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name') || '';
+                const session = row.getAttribute('data-session') || '';
+                const available = row.getAttribute('data-available') || '';
+
+                const matchSearch = name.includes(query) || session.includes(query);
+                const matchAvail = availVal === '' || available === availVal;
+
+                row.style.display = (matchSearch && matchAvail) ? '' : 'none';
+            });
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        filterAvail.addEventListener('change', filterTable);
+    });
+</script>
+{% endblock %}

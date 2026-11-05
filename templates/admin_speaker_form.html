@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if speaker else 'Add' }} Speaker — Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        border-radius: 2rem;
+    }
+    .form-card {
+        border: none;
+        border-radius: 2rem;
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(4px);
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.12);
+        overflow: hidden;
+        transition: transform 0.3s;
+    }
+    .form-card:hover {
+        transform: translateY(-5px);
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+        text-align: center;
+    }
+    .form-card .card-header h3 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .form-card .card-header i {
+        font-size: 2.5rem;
+        margin-bottom: 0.3rem;
+    }
+    .form-card .card-body {
+        padding: 2.5rem 2.5rem;
+    }
+
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    .form-floating > .form-control,
+    .form-floating > .form-select,
+    .form-floating > textarea {
+        border-radius: 1rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.2s ease;
+        background: #f8f9fa;
+        min-height: 60px;
+    }
+    .form-floating > .form-control:focus,
+    .form-floating > .form-select:focus,
+    .form-floating > textarea:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        background: white;
+    }
+    .form-floating > label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .form-check-label {
+        font-weight: 500;
+    }
+
+    .btn-save {
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    .btn-save:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(13,110,253,0.3);
+        background: linear-gradient(135deg, #0b5ed7, #5a0fc7);
+        color: white;
+    }
+
+    @media (max-width: 576px) {
+        .form-card .card-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card form-card">
+            <div class="card-header">
+                <i class="bi bi-{{ 'pencil-square' if speaker else 'person-plus' }}"></i>
+                <h3>{{ 'Edit' if speaker else 'Add' }} Speaker</h3>
+                <p class="mb-0" style="opacity:0.85;">{{ 'Update' if speaker else 'Add a new' }} speaker to your events</p>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <!-- Name -->
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="name" name="name"
+                               value="{{ speaker.name if speaker else '' }}" placeholder="Full name" required>
+                        <label for="name"><i class="bi bi-person me-2"></i>Full Name</label>
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="form-floating">
+                        <textarea class="form-control" id="bio" name="bio" placeholder="Bio"
+                                  style="min-height: 80px;">{{ speaker.bio if speaker else '' }}</textarea>
+                        <label for="bio"><i class="bi bi-file-text me-2"></i>Bio / Description</label>
+                    </div>
+
+                    <!-- Session Title -->
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="session_title" name="session_title"
+                               value="{{ speaker.session_title if speaker else '' }}" placeholder="Session title">
+                        <label for="session_title"><i class="bi bi-mic me-2"></i>Session Title</label>
+                    </div>
+
+                    <!-- Schedule -->
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="schedule" name="schedule"
+                               value="{{ speaker.schedule if speaker else '' }}" placeholder="e.g. Day 1 10:00">
+                        <label for="schedule"><i class="bi bi-clock me-2"></i>Schedule</label>
+                    </div>
+
+                    <!-- Availability (checkbox) -->
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="availability" name="availability"
+                               value="1" {% if speaker and speaker.availability %}checked{% endif %}>
+                        <label class="form-check-label" for="availability">
+                            <i class="bi bi-check-circle text-success"></i> Available
+                        </label>
+                    </div>
+
+                    <!-- Buttons -->
+                    <button type="submit" class="btn btn-save">
+                        <i class="bi bi-check-circle me-2"></i> {{ 'Update' if speaker else 'Create' }} Speaker
+                    </button>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('admin_speakers') }}" class="text-decoration-none text-muted">
+                            <i class="bi bi-arrow-left"></i> Cancel and go back
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
