@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block title %}Admin — Incidents{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        padding: 2rem 0;
+        border-radius: 2rem;
+    }
+    .admin-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.10);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(4px);
+        overflow: hidden;
+    }
+    .admin-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.2rem 1.5rem;
+        border: none;
+    }
+    .admin-card .card-header h2 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .admin-card .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Stats row */
+    .stats-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 1rem;
+        padding: 1rem;
+    }
+    .stats-row .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .stats-row .stat-item i {
+        font-size: 1.2rem;
+        color: #0d6efd;
+    }
+    .stats-row .stat-item .stat-num {
+        font-weight: 700;
+        color: #0d6efd;
+        font-size: 1.1rem;
+        margin: 0 0.3rem;
+    }
+
+    /* Filters */
+    .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+    .filter-bar .search-box {
+        flex: 1;
+        min-width: 200px;
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.2s;
+        background: white;
+    }
+    .filter-bar .search-box:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        outline: none;
+    }
+    .filter-bar .filter-select {
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem 1.2rem;
+        background: white;
+        transition: all 0.2s;
+        min-width: 140px;
+    }
+    .filter-bar .filter-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        outline: none;
+    }
+
+    /* Table */
+    .table-hover tbody tr {
+        transition: all 0.2s ease;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #e7f0ff !important;
+    }
+    .badge-status {
+        padding: 0.3rem 0.9rem;
+        border-radius: 30px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    .priority-high {
+        background: #dc3545;
+        color: white;
+    }
+    .priority-medium {
+        background: #ffc107;
+        color: #212529;
+    }
+    .priority-low {
+        background: #0d6efd;
+        color: white;
+    }
+    .status-open {
+        background: #dc3545;
+        color: white;
+    }
+    .status-resolved {
+        background: #198754;
+        color: white;
+    }
+    .btn-outline-primary,
+    .btn-outline-warning,
+    .btn-outline-danger {
+        border-radius: 30px;
+        transition: all 0.2s;
+    }
+    .btn-outline-primary:hover,
+    .btn-outline-warning:hover,
+    .btn-outline-danger:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .total-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 0.2rem 1rem;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+    .incident-title {
+        font-weight: 600;
+    }
+    .time-ago {
+        font-size: 0.8rem;
+        color: #6c757d;
+        display: block;
+        margin-top: 0.2rem;
+    }
+
+    @media (max-width: 576px) {
+        .admin-card .card-body {
+            padding: 1rem;
+        }
+        .table {
+            font-size: 0.85rem;
+        }
+        .stats-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .filter-bar {
+            flex-direction: column;
+        }
+        .filter-bar .search-box,
+        .filter-bar .filter-select {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <div class="container-fluid">
+        <div class="card admin-card">
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <h2 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Incidents</h2>
+                <div>
+                    <span class="total-badge"><i class="bi bi-database"></i> Total: {{ incidents|length }}</span>
+                    <a href="{{ url_for('admin_incident_add') }}" class="btn btn-light btn-sm ms-2">
+                        <i class="bi bi-plus-circle"></i> Add Incident
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-item"><i class="bi bi-exclamation-triangle"></i> Total: <span class="stat-num">{{ incidents|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-circle-fill text-danger"></i> Open: <span class="stat-num">{{ incidents|selectattr('status', 'equalto', 'open')|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-check-circle text-success"></i> Resolved: <span class="stat-num">{{ incidents|selectattr('status', 'equalto', 'resolved')|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-arrow-up text-danger"></i> High Priority: <span class="stat-num">{{ incidents|selectattr('priority', 'equalto', 'high')|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-clock text-warning"></i> Medium: <span class="stat-num">{{ incidents|selectattr('priority', 'equalto', 'medium')|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-arrow-down text-info"></i> Low: <span class="stat-num">{{ incidents|selectattr('priority', 'equalto', 'low')|list|length }}</span></div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                    <input type="text" id="searchIncident" class="search-box" placeholder="🔍 Search by title...">
+                    <select id="filterPriority" class="filter-select">
+                        <option value="">All priorities</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <select id="filterStatus" class="filter-select">
+                        <option value="">All statuses</option>
+                        <option value="open">Open</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="incidentTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Reported</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inc in incidents %}
+                            <tr data-title="{{ inc.title|lower }}"
+                                data-priority="{{ inc.priority|lower }}"
+                                data-status="{{ inc.status|lower }}">
+                                <td>{{ inc.id }}</td>
+                                <td>
+                                    <div class="incident-title">{{ inc.title }}</div>
+                                    {% if inc.description %}
+                                        <small class="text-muted">{{ inc.description[:60] }}{% if inc.description|length > 60 %}...{% endif %}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge-status priority-{{ inc.priority }}">
+                                        {{ inc.priority|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge-status status-{{ inc.status }}">
+                                        {{ inc.status|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{ inc.reported_at.strftime('%Y-%m-%d %H:%M') }}
+                                    <span class="time-ago">
+                                        <i class="bi bi-clock"></i> {{ inc.time_ago }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin_incident_edit', incident_id=inc.id) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{{ url_for('admin_incident_delete', incident_id=inc.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this incident?')"><i class="bi bi-trash"></i></a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-check-circle fs-1 d-block mb-2 text-success"></i>
+                                    No incidents reported. Everything is running smoothly!
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchIncident');
+        const filterPriority = document.getElementById('filterPriority');
+        const filterStatus = document.getElementById('filterStatus');
+        const rows = document.querySelectorAll('#incidentTable tbody tr');
+
+        function filterTable() {
+            const query = searchInput.value.toLowerCase().trim();
+            const priority = filterPriority.value;
+            const status = filterStatus.value;
+
+            rows.forEach(row => {
+                const title = row.getAttribute('data-title') || '';
+                const rowPriority = row.getAttribute('data-priority') || '';
+                const rowStatus = row.getAttribute('data-status') || '';
+
+                const matchSearch = title.includes(query);
+                const matchPriority = priority === '' || rowPriority === priority;
+                const matchStatus = status === '' || rowStatus === status;
+
+                row.style.display = (matchSearch && matchPriority && matchStatus) ? '' : 'none';
+            });
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        filterPriority.addEventListener('change', filterTable);
+        filterStatus.addEventListener('change', filterTable);
+    });
+</script>
+{% endblock %}
