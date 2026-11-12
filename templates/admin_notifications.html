@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}Admin — Notifications{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        padding: 2rem 0;
+        border-radius: 2rem;
+    }
+    .admin-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.10);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(4px);
+        overflow: hidden;
+    }
+    .admin-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.2rem 1.5rem;
+        border: none;
+    }
+    .admin-card .card-header h2 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .admin-card .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Stats row */
+    .stats-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 1rem;
+        padding: 1rem;
+    }
+    .stats-row .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .stats-row .stat-item i {
+        font-size: 1.2rem;
+        color: #0d6efd;
+    }
+    .stats-row .stat-item .stat-num {
+        font-weight: 700;
+        color: #0d6efd;
+        font-size: 1.1rem;
+        margin: 0 0.3rem;
+    }
+
+    /* Search & Filter */
+    .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+    .filter-bar .search-box {
+        flex: 1;
+        min-width: 200px;
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.2s;
+        background: white;
+    }
+    .filter-bar .search-box:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        outline: none;
+    }
+    .filter-bar .filter-select {
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem 1.2rem;
+        background: white;
+        transition: all 0.2s;
+        min-width: 140px;
+    }
+    .filter-bar .filter-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        outline: none;
+    }
+
+    /* Table */
+    .table-hover tbody tr {
+        transition: all 0.2s ease;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #e7f0ff !important;
+    }
+    .badge-status {
+        padding: 0.3rem 0.9rem;
+        border-radius: 30px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+    .btn-outline-primary,
+    .btn-outline-warning,
+    .btn-outline-danger {
+        border-radius: 30px;
+        transition: all 0.2s;
+    }
+    .btn-outline-primary:hover,
+    .btn-outline-warning:hover,
+    .btn-outline-danger:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .total-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 0.2rem 1rem;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+    .recipient-email {
+        font-weight: 500;
+        color: #0d6efd;
+    }
+    .subject-preview {
+        max-width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+    }
+
+    @media (max-width: 576px) {
+        .admin-card .card-body {
+            padding: 1rem;
+        }
+        .table {
+            font-size: 0.85rem;
+        }
+        .stats-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .filter-bar {
+            flex-direction: column;
+        }
+        .filter-bar .search-box,
+        .filter-bar .filter-select {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <div class="container-fluid">
+        <div class="card admin-card">
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <h2 class="mb-0"><i class="bi bi-bell me-2"></i>Notifications</h2>
+                <div>
+                    <span class="total-badge"><i class="bi bi-database"></i> Total: {{ notifications|length }}</span>
+                    <a href="{{ url_for('admin_notification_send') }}" class="btn btn-light btn-sm ms-2">
+                        <i class="bi bi-plus-circle"></i> Send New
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-item"><i class="bi bi-envelope"></i> Total: <span class="stat-num">{{ notifications|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-check-circle text-success"></i> Read: <span class="stat-num">{{ notifications|selectattr('read', 'equalto', True)|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-clock text-warning"></i> Unread: <span class="stat-num">{{ notifications|selectattr('read', 'equalto', False)|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-envelope-paper text-primary"></i> Email: <span class="stat-num">{{ notifications|selectattr('channel', 'equalto', 'email')|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-chat-dots text-info"></i> SMS: <span class="stat-num">{{ notifications|selectattr('channel', 'equalto', 'sms')|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-bell-fill text-warning"></i> Push: <span class="stat-num">{{ notifications|selectattr('channel', 'equalto', 'push')|list|length }}</span></div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                    <input type="text" id="searchNotif" class="search-box" placeholder="🔍 Search by recipient or subject...">
+                    <select id="filterChannel" class="filter-select">
+                        <option value="">All channels</option>
+                        <option value="email">Email</option>
+                        <option value="sms">SMS</option>
+                        <option value="push">Push</option>
+                    </select>
+                    <select id="filterRead" class="filter-select">
+                        <option value="">All status</option>
+                        <option value="true">Read</option>
+                        <option value="false">Unread</option>
+                    </select>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="notifTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Recipient</th>
+                                <th>Channel</th>
+                                <th>Subject</th>
+                                <th>Sent</th>
+                                <th>Read</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for notif in notifications %}
+                            <tr data-recipient="{{ notif.recipient|lower }}"
+                                data-subject="{{ notif.subject|lower }}"
+                                data-channel="{{ notif.channel|lower }}"
+                                data-read="{{ notif.read|string|lower }}">
+                                <td>{{ notif.id }}</td>
+                                <td><span class="recipient-email">{{ notif.recipient }}</span></td>
+                                <td>
+                                    <span class="badge-status bg-{{ 'primary' if notif.channel == 'email' else 'success' if notif.channel == 'sms' else 'warning' }}">
+                                        <i class="bi bi-{{ 'envelope' if notif.channel == 'email' else 'chat' if notif.channel == 'sms' else 'bell' }}"></i>
+                                        {{ notif.channel|title }}
+                                    </span>
+                                </td>
+                                <td><span class="subject-preview" title="{{ notif.subject }}">{{ notif.subject }}</span></td>
+                                <td>{{ notif.sent_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <span class="badge-status bg-{{ 'success' if notif.read else 'secondary' }}">
+                                        {{ 'Read' if notif.read else 'Unread' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="bi bi-check-circle fs-1 d-block mb-2 text-success"></i>
+                                    No notifications yet. Send your first one!
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchNotif');
+        const filterChannel = document.getElementById('filterChannel');
+        const filterRead = document.getElementById('filterRead');
+        const rows = document.querySelectorAll('#notifTable tbody tr');
+
+        function filterTable() {
+            const query = searchInput.value.toLowerCase().trim();
+            const channel = filterChannel.value;
+            const readStatus = filterRead.value;
+
+            rows.forEach(row => {
+                const recipient = row.getAttribute('data-recipient') || '';
+                const subject = row.getAttribute('data-subject') || '';
+                const rowChannel = row.getAttribute('data-channel') || '';
+                const rowRead = row.getAttribute('data-read') || '';
+
+                const matchSearch = recipient.includes(query) || subject.includes(query);
+                const matchChannel = channel === '' || rowChannel === channel;
+                const matchRead = readStatus === '' || rowRead === readStatus;
+
+                row.style.display = (matchSearch && matchChannel && matchRead) ? '' : 'none';
+            });
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        filterChannel.addEventListener('change', filterTable);
+        filterRead.addEventListener('change', filterTable);
+    });
+</script>
+{% endblock %}

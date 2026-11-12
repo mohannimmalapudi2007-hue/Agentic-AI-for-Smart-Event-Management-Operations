@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Send Notification — Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        border-radius: 2rem;
+    }
+    .form-card {
+        border: none;
+        border-radius: 2rem;
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(4px);
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.12);
+        overflow: hidden;
+        transition: transform 0.3s;
+    }
+    .form-card:hover {
+        transform: translateY(-5px);
+    }
+    .form-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+        text-align: center;
+    }
+    .form-card .card-header h3 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .form-card .card-header i {
+        font-size: 2.5rem;
+        margin-bottom: 0.3rem;
+    }
+    .form-card .card-body {
+        padding: 2.5rem 2.5rem;
+    }
+
+    .form-floating {
+        margin-bottom: 1.5rem;
+    }
+    .form-floating > .form-control,
+    .form-floating > .form-select,
+    .form-floating > textarea {
+        border-radius: 1rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.2s ease;
+        background: #f8f9fa;
+        min-height: 60px;
+    }
+    .form-floating > .form-control:focus,
+    .form-floating > .form-select:focus,
+    .form-floating > textarea:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        background: white;
+    }
+    .form-floating > label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .btn-send {
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    .btn-send:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(13,110,253,0.3);
+        background: linear-gradient(135deg, #0b5ed7, #5a0fc7);
+        color: white;
+    }
+
+    .channel-options {
+        display: flex;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .channel-options .channel-btn {
+        flex: 1;
+        padding: 0.6rem;
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        background: white;
+        transition: all 0.2s;
+        text-align: center;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    .channel-options .channel-btn input[type="radio"] {
+        display: none;
+    }
+    .channel-options .channel-btn.active-email {
+        border-color: #0d6efd;
+        background: #cfe2ff;
+        color: #0d6efd;
+    }
+    .channel-options .channel-btn.active-sms {
+        border-color: #198754;
+        background: #d1e7dd;
+        color: #198754;
+    }
+    .channel-options .channel-btn.active-push {
+        border-color: #ffc107;
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    @media (max-width: 576px) {
+        .form-card .card-body {
+            padding: 1.5rem;
+        }
+        .channel-options .channel-btn {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card form-card">
+            <div class="card-header">
+                <i class="bi bi-send-plus"></i>
+                <h3>Send Notification</h3>
+                <p class="mb-0" style="opacity:0.85;">Compose and send a message to your audience</p>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin_notification_send') }}">
+                    <!-- Recipient -->
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="recipient" name="recipient"
+                               placeholder="recipient@example.com" required>
+                        <label for="recipient"><i class="bi bi-person me-2"></i>Recipient Email</label>
+                    </div>
+
+                    <!-- Channel (radio buttons styled as pills) -->
+                    <label class="form-label fw-semibold"><i class="bi bi-megaphone me-2"></i>Channel</label>
+                    <div class="channel-options" id="channelGroup">
+                        <label class="channel-btn active-email">
+                            <input type="radio" name="channel" value="email" checked>
+                            <i class="bi bi-envelope"></i> Email
+                        </label>
+                        <label class="channel-btn">
+                            <input type="radio" name="channel" value="sms">
+                            <i class="bi bi-chat-dots"></i> SMS
+                        </label>
+                        <label class="channel-btn">
+                            <input type="radio" name="channel" value="push">
+                            <i class="bi bi-bell"></i> Push
+                        </label>
+                    </div>
+
+                    <!-- Subject -->
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="subject" name="subject"
+                               placeholder="Notification subject" required>
+                        <label for="subject"><i class="bi bi-file-text me-2"></i>Subject</label>
+                    </div>
+
+                    <!-- Message -->
+                    <div class="form-floating">
+                        <textarea class="form-control" id="message" name="message"
+                                  placeholder="Your message here..." style="min-height: 120px;" required></textarea>
+                        <label for="message"><i class="bi bi-chat-text me-2"></i>Message</label>
+                    </div>
+
+                    <!-- Buttons -->
+                    <button type="submit" class="btn btn-send">
+                        <i class="bi bi-send me-2"></i> Send Notification
+                    </button>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('admin_notifications') }}" class="text-decoration-none text-muted">
+                            <i class="bi bi-arrow-left"></i> Cancel and go back
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const channelBtns = document.querySelectorAll('.channel-btn');
+        channelBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove all active classes
+                channelBtns.forEach(b => {
+                    b.classList.remove('active-email', 'active-sms', 'active-push');
+                });
+                // Add active class based on value
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    const val = radio.value;
+                    if (val === 'email') this.classList.add('active-email');
+                    else if (val === 'sms') this.classList.add('active-sms');
+                    else if (val === 'push') this.classList.add('active-push');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
