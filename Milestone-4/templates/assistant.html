@@ -1,0 +1,436 @@
+{% extends "base.html" %}
+
+{% block title %}AI Assistant — EventOps AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .chat-container {
+        background: white;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 75vh;
+    }
+    .chat-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .chat-header .left {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    .chat-header .left i {
+        font-size: 2rem;
+    }
+    .chat-header .actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .chat-header .actions button {
+        background: rgba(255,255,255,0.15);
+        border: none;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        transition: 0.2s;
+    }
+    .chat-header .actions button:hover {
+        background: rgba(255,255,255,0.3);
+    }
+    .quick-actions {
+        padding: 0.5rem 1.5rem;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .quick-actions button {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 0.3rem 1rem;
+        font-size: 0.8rem;
+        transition: 0.2s;
+        color: #212529;
+    }
+    .quick-actions button:hover {
+        background: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+        transform: translateY(-1px);
+    }
+    .chat-messages {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+        background: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    .message {
+        max-width: 80%;
+        padding: 0.8rem 1.2rem;
+        border-radius: 1rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+        position: relative;
+        animation: fadeIn 0.3s ease;
+    }
+    .message.user {
+        align-self: flex-end;
+        background: #0d6efd;
+        color: white;
+        border-bottom-right-radius: 0.2rem;
+    }
+    .message.assistant {
+        align-self: flex-start;
+        background: white;
+        color: #212529;
+        border-bottom-left-radius: 0.2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .message .time {
+        font-size: 0.65rem;
+        opacity: 0.6;
+        margin-top: 0.3rem;
+        display: block;
+        text-align: right;
+    }
+    .message.assistant .time {
+        color: #6c757d;
+    }
+    .message.user .time {
+        color: rgba(255,255,255,0.7);
+    }
+    .message.assistant .copy-btn {
+        position: absolute;
+        top: 0.3rem;
+        right: 0.5rem;
+        background: none;
+        border: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        color: #6c757d;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+    .message.assistant:hover .copy-btn {
+        opacity: 1;
+    }
+    .message ul {
+        padding-left: 1.5rem;
+        margin-bottom: 0;
+    }
+    .typing-indicator {
+        display: none;
+        align-self: flex-start;
+        background: white;
+        padding: 0.8rem 1.2rem;
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        color: #6c757d;
+    }
+    .typing-indicator span {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background: #6c757d;
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: bounce 1.4s infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-4px); }
+    }
+    .chat-input {
+        padding: 1rem 1.5rem;
+        background: white;
+        border-top: 1px solid #dee2e6;
+        display: flex;
+        gap: 0.8rem;
+    }
+    .chat-input input {
+        flex: 1;
+        padding: 0.8rem 1.2rem;
+        border: 2px solid #e9ecef;
+        border-radius: 50px;
+        transition: 0.2s;
+    }
+    .chat-input input:focus {
+        border-color: #0d6efd;
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15);
+    }
+    .chat-input button {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 50px;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+    .chat-input button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 15px rgba(13,110,253,0.3);
+    }
+    .chat-input button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    @media (max-width: 576px) {
+        .chat-container { height: 85vh; }
+        .message { max-width: 90%; }
+        .quick-actions button { font-size: 0.7rem; padding: 0.2rem 0.7rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4 chat-wrapper">
+    <div class="chat-container">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="left">
+                <i class="bi bi-robot"></i>
+                <div>
+                    <h5 class="mb-0">EventOps AI Assistant</h5>
+                    <small style="opacity:0.8;">Powered by Gemini 2.0 Flash</small>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="clearChatBtn" title="Clear chat history"><i class="bi bi-trash"></i> Clear</button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions" id="quickActions">
+            <button class="qa-btn" data-msg="Show me upcoming events">📅 Upcoming Events</button>
+            <button class="qa-btn" data-msg="Show my registrations">📋 My Registrations</button>
+            <button class="qa-btn" data-msg="List all venues">🏢 Venues</button>
+            <button class="qa-btn" data-msg="List all speakers">🎤 Speakers</button>
+            <button class="qa-btn" data-msg="Remind me about the AI Summit 1 hour before">⏰ Set Reminder</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="message assistant" id="welcomeMsg">
+                👋 Hello! I'm your EventOps AI assistant. I can help you with event details, registrations, venues, speakers, and reminders. Just ask or click a quick action above!
+                <span class="time">{{ now.strftime('%I:%M %p') }}</span>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span><span></span><span></span>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Type your question..." autofocus>
+            <button id="sendBtn"><i class="bi bi-send"></i> Send</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const clearBtn = document.getElementById('clearChatBtn');
+
+        // --- Helpers ---
+        function getTimestamp() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatMessage(text) {
+            // Basic markdown: bold *text* -> <strong>text</strong>
+            let formatted = text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+            // Convert newlines to <br> for non-list content
+            if (!formatted.includes('<ul>')) {
+                formatted = formatted.replace(/\n/g, '<br>');
+            }
+            return formatted;
+        }
+
+        function appendMessage(text, sender) {
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+
+            // Check if text contains bullet list (lines starting with • or -)
+            const lines = text.split('\n');
+            const hasBullets = lines.some(line => line.trim().startsWith('•') || line.trim().startsWith('-'));
+            if (hasBullets) {
+                const ul = document.createElement('ul');
+                lines.forEach(line => {
+                    const trimmed = line.trim();
+                    if (trimmed) {
+                        const li = document.createElement('li');
+                        li.innerHTML = formatMessage(trimmed.replace(/^[•\-]\s*/, ''));
+                        ul.appendChild(li);
+                    }
+                });
+                div.appendChild(ul);
+            } else {
+                div.innerHTML = formatMessage(text);
+            }
+
+            // Timestamp
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'time';
+            timeSpan.textContent = getTimestamp();
+            div.appendChild(timeSpan);
+
+            // Copy button for assistant messages
+            if (sender === 'assistant') {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+                copyBtn.title = 'Copy to clipboard';
+                copyBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const textToCopy = text;
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        copyBtn.innerHTML = '<i class="bi bi-check2"></i>';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+                        }, 2000);
+                    }).catch(() => {
+                        // Fallback
+                        const range = document.createRange();
+                        range.selectNode(div);
+                        window.getSelection().removeAllRanges();
+                        window.getSelection().addRange(range);
+                        document.execCommand('copy');
+                    });
+                });
+                div.appendChild(copyBtn);
+            }
+
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        function setInputEnabled(enabled) {
+            userInput.disabled = !enabled;
+            sendBtn.disabled = !enabled;
+        }
+
+        // --- Send message ---
+        async function sendMessage(message) {
+            if (!message || !message.trim()) return;
+            const msg = message.trim();
+            userInput.value = '';
+            appendMessage(msg, 'user');
+            showTyping();
+            setInputEnabled(false);
+
+            try {
+                const response = await fetch('/api/assistant', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg })
+                });
+                const data = await response.json();
+                hideTyping();
+                if (data.error) {
+                    appendMessage('❌ ' + data.error, 'assistant');
+                } else {
+                    appendMessage(data.reply, 'assistant');
+                }
+            } catch (error) {
+                hideTyping();
+                appendMessage('⚠️ Sorry, I encountered an error. Please try again.', 'assistant');
+            } finally {
+                setInputEnabled(true);
+                userInput.focus();
+            }
+        }
+
+        // --- Event listeners ---
+        sendBtn.addEventListener('click', function() {
+            sendMessage(userInput.value);
+        });
+
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage(userInput.value);
+            }
+        });
+
+        // Quick action buttons
+        document.querySelectorAll('.qa-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const msg = this.getAttribute('data-msg');
+                sendMessage(msg);
+            });
+        });
+
+        // Clear chat (keep welcome message)
+        clearBtn.addEventListener('click', function() {
+            const welcome = document.getElementById('welcomeMsg');
+            chatMessages.innerHTML = '';
+            // Re-insert welcome message
+            const welcomeClone = welcome.cloneNode(true);
+            welcomeClone.id = 'welcomeMsg';
+            // Update timestamp
+            const timeSpan = welcomeClone.querySelector('.time');
+            if (timeSpan) timeSpan.textContent = getTimestamp();
+            chatMessages.appendChild(welcomeClone);
+            // Remove any extra welcome messages (if present)
+            // Also ensure only one welcome message
+            const existing = chatMessages.querySelectorAll('#welcomeMsg');
+            if (existing.length > 1) {
+                for (let i = 1; i < existing.length; i++) {
+                    existing[i].remove();
+                }
+            }
+        });
+
+        // Auto-focus
+        userInput.focus();
+
+        // Auto-resize textarea if we ever switch to textarea (not needed now)
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Admin — Registrations{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        padding: 2rem 0;
+        border-radius: 2rem;
+    }
+    .admin-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.10);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(4px);
+        overflow: hidden;
+    }
+    .admin-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.2rem 1.5rem;
+        border: none;
+    }
+    .admin-card .card-header h2 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .admin-card .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Stats row */
+    .stats-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 1rem;
+        padding: 1rem;
+    }
+    .stats-row .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: white;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .stats-row .stat-item i {
+        font-size: 1.2rem;
+        color: #0d6efd;
+    }
+    .stats-row .stat-item .stat-num {
+        font-weight: 700;
+        color: #0d6efd;
+        font-size: 1.1rem;
+        margin: 0 0.3rem;
+    }
+
+    /* Search & filter */
+    .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+    .filter-bar .search-box {
+        flex: 1;
+        min-width: 200px;
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem 1.2rem;
+        transition: all 0.2s;
+        background: white;
+    }
+    .filter-bar .search-box:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        outline: none;
+    }
+    .filter-bar .filter-select {
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 0.5rem 1.2rem;
+        background: white;
+        transition: all 0.2s;
+        min-width: 140px;
+    }
+    .filter-bar .filter-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        outline: none;
+    }
+
+    /* Table */
+    .table-hover tbody tr {
+        transition: all 0.2s ease;
+    }
+    .table-hover tbody tr:hover {
+        background-color: #e7f0ff !important;
+    }
+    .badge-status {
+        padding: 0.3rem 0.9rem;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+    .btn-outline-primary {
+        border-radius: 30px;
+        transition: all 0.2s;
+    }
+    .btn-outline-primary:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(13,110,253,0.2);
+    }
+    .total-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 0.2rem 1rem;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+
+    @media (max-width: 576px) {
+        .admin-card .card-body {
+            padding: 1rem;
+        }
+        .table {
+            font-size: 0.85rem;
+        }
+        .stats-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .filter-bar {
+            flex-direction: column;
+        }
+        .filter-bar .search-box,
+        .filter-bar .filter-select {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <div class="container-fluid">
+        <div class="card admin-card">
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center">
+                <h2 class="mb-0"><i class="bi bi-people me-2"></i>All Users Registration Management</h2>
+                <span class="total-badge">
+                    <i class="bi bi-database"></i> Total: {{ registrations|length }}
+                </span>
+            </div>
+            <div class="card-body">
+
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-item"><i class="bi bi-person-check"></i> Total: <span class="stat-num">{{ registrations|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-check-circle text-success"></i> Checked In: <span class="stat-num">{{ registrations|selectattr('checked_in', 'equalto', True)|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-clock-history text-warning"></i> Pending: <span class="stat-num">{{ registrations|selectattr('checked_in', 'equalto', False)|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-person text-primary"></i> Users: <span class="stat-num">{{ registrations|map(attribute='user_id')|unique|list|length }}</span></div>
+                    <div class="stat-item"><i class="bi bi-calendar-event text-info"></i> Events: <span class="stat-num">{{ registrations|map(attribute='event_id')|unique|list|length }}</span></div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <input type="text" id="searchReg" class="search-box" placeholder="🔍 Search event or user...">
+                    <select id="filterChecked" class="filter-select">
+                        <option value="">All status</option>
+                        <option value="true">Checked In</option>
+                        <option value="false">Not Checked In</option>
+                    </select>
+                    <select id="filterTicket" class="filter-select">
+                        <option value="">All tickets</option>
+                        <option value="Standard">Standard</option>
+                        <option value="VIP">VIP</option>
+                        <option value="Speaker">Speaker</option>
+                        <option value="Press">Press</option>
+                    </select>
+                </div>
+
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="regTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Event</th>
+                                <th>User</th>
+                                <th>Ticket</th>
+                                <th>Status</th>
+                                <th>Checked In</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reg in registrations %}
+                            <tr data-event="{{ reg.event.title|lower }}"
+                                data-user="{{ reg.user.name|lower if reg.user else '' }}"
+                                data-checked="{{ reg.checked_in|string|lower }}"
+                                data-ticket="{{ reg.ticket_type|lower }}">
+                                <td>{{ reg.id }}</td>
+                                <td><strong>{{ reg.event.title }}</strong></td>
+                                <td>{{ reg.user.name if reg.user else 'N/A' }}</td>
+                                <td><span class="badge bg-info-subtle text-info">{{ reg.ticket_type }}</span></td>
+                                <td><span class="badge-status bg-{{ 'success' if reg.status == 'registered' else 'warning' }}">{{ reg.status|title }}</span></td>
+                                <td>
+                                    <span class="badge-status bg-{{ 'success' if reg.checked_in else 'secondary' }}">
+                                        {{ 'Yes' if reg.checked_in else 'No' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin_checkin', reg_id=reg.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-check-circle"></i> Toggle Check-in
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    No registrations yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Back button -->
+                <div class="mt-3">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchReg');
+        const filterChecked = document.getElementById('filterChecked');
+        const filterTicket = document.getElementById('filterTicket');
+        const rows = document.querySelectorAll('#regTable tbody tr');
+
+        function filterTable() {
+            const query = searchInput.value.toLowerCase().trim();
+            const checkedVal = filterChecked.value;
+            const ticketVal = filterTicket.value.toLowerCase();
+
+            rows.forEach(row => {
+                const event = row.getAttribute('data-event') || '';
+                const user = row.getAttribute('data-user') || '';
+                const checked = row.getAttribute('data-checked') || '';
+                const ticket = row.getAttribute('data-ticket') || '';
+
+                const matchSearch = event.includes(query) || user.includes(query);
+                const matchChecked = checkedVal === '' || checked === checkedVal;
+                const matchTicket = ticketVal === '' || ticket === ticketVal;
+
+                row.style.display = (matchSearch && matchChecked && matchTicket) ? '' : 'none';
+            });
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        filterChecked.addEventListener('change', filterTable);
+        filterTicket.addEventListener('change', filterTable);
+    });
+</script>
+{% endblock %}

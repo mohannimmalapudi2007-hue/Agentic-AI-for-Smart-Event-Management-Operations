@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Events — EventOps AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .browse-wrapper {
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        padding: 2rem 0;
+        border-radius: 2rem;
+    }
+    .event-card {
+        border: none;
+        border-radius: 1.5rem;
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(4px);
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+    .event-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(13, 110, 253, 0.12);
+    }
+    .event-card .card-body {
+        padding: 1.5rem;
+    }
+    .event-card .card-title {
+        font-weight: 700;
+        color: #0d6efd;
+    }
+    .event-card .card-text {
+        min-height: 3rem;
+    }
+    .event-card .event-meta {
+        font-size: 0.9rem;
+        color: #495057;
+        margin-top: 0.3rem;
+    }
+    .event-card .event-meta i {
+        color: #6c757d;
+        width: 1.2rem;
+    }
+    .event-card .card-footer {
+        background: transparent;
+        border-top: 1px solid rgba(0,0,0,0.05);
+        padding: 1rem 1.5rem;
+    }
+    .event-card .btn-outline-primary {
+        border-radius: 50px;
+        transition: all 0.2s;
+    }
+    .event-card .btn-outline-primary:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(13,110,253,0.2);
+    }
+    .status-badge {
+        padding: 0.3rem 1rem;
+        border-radius: 30px;
+        font-weight: 500;
+    }
+    .search-bar {
+        border-radius: 50px;
+        border: 2px solid #e9ecef;
+        padding: 0.6rem 1.5rem;
+        width: 100%;
+        max-width: 350px;
+        transition: all 0.2s;
+    }
+    .search-bar:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+        outline: none;
+    }
+    @media (max-width: 576px) {
+        .event-card .card-body {
+            padding: 1rem;
+        }
+        .search-bar {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="browse-wrapper">
+    <div class="container">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="bi bi-calendar-event text-primary"></i> All Events Details</h2>
+            <div>
+                <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search events...">
+            </div>
+        </div>
+
+        <div class="row g-4" id="eventGrid">
+            {% for event in events %}
+            <div class="col-md-4 col-sm-6 event-item"
+                 data-title="{{ event.title|lower }}"
+                 data-location="{{ event.location|lower }}">
+                <div class="card event-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        <p class="card-text small text-muted">
+                            {{ event.description[:120] }}{% if event.description|length > 120 %}...{% endif %}
+                        </p>
+                        <div class="event-meta">
+                            <div><i class="bi bi-calendar-date"></i> {{ event.date }} at {{ event.time }}</div>
+                            <div><i class="bi bi-geo-alt"></i> {{ event.location }}</div>
+                            <div><i class="bi bi-people"></i> Capacity: {{ event.capacity }}</div>
+                        </div>
+                        <span class="status-badge bg-{{ 'success' if event.status == 'upcoming' else 'warning' if event.status == 'ongoing' else 'secondary' }}">
+                            {{ event.status|title }}
+                        </span>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('event_detail', event_id=event.id) }}"
+                           class="btn btn-outline-primary btn-sm w-100">
+                            <i class="bi bi-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center text-muted py-5">
+                <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+                No events available at the moment.
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const eventItems = document.querySelectorAll('.event-item');
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            eventItems.forEach(item => {
+                const title = item.getAttribute('data-title') || '';
+                const location = item.getAttribute('data-location') || '';
+                const match = title.includes(query) || location.includes(query);
+                item.style.display = match ? '' : 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

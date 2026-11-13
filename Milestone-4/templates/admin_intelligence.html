@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+
+{% block title %}Admin — Intelligence Engine{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-graph-up-arrow"></i> Event Intelligence Engine</h2>
+    <div>
+        <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">
+            <i class="bi bi-arrow-repeat"></i> Refresh
+        </button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-heart-pulse fs-3 text-primary"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Health Score</h6>
+                    <h3 class="mb-0">{{ health_score|default(0) }}%</h3>
+                    <small class="text-muted">Last updated: {{ last_updated|default('N/A') }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-robot fs-3 text-success"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Active Agents</h6>
+                    <h3 class="mb-0">{{ active_agents|default(0) }}/{{ total_agents|default(0) }}</h3>
+                    <small class="text-muted">{{ ((active_agents|default(0) / total_agents|default(1)) * 100)|round|int }}% online</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-exclamation-triangle fs-3 text-warning"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Open Incidents</h6>
+                    <h3 class="mb-0">{{ open_incidents|default(0) }}</h3>
+                    <small class="text-muted">{{ resolved_incidents|default(0) }} resolved today</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-people fs-3 text-info"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Registrations</h6>
+                    <h3 class="mb-0">{{ total_registrations|default(0) }}</h3>
+                    <small class="text-muted">{{ checked_in|default(0) }} checked in</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-clock fs-3 text-danger"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Avg. Response Time</h6>
+                    <h3 class="mb-0">{{ avg_response_time|default(0) }}s</h3>
+                    <small class="text-muted">{{ response_trend|default(0) }}% from yesterday</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-purple bg-opacity-10 p-3 me-3" style="background-color: #6f42c1;">
+                    <i class="bi bi-mic fs-3 text-purple" style="color: #6f42c1;"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Upcoming Sessions</h6>
+                    <h3 class="mb-0">{{ upcoming_sessions|default(0) }}</h3>
+                    <small class="text-muted">next in {{ next_session_time|default('N/A') }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-teal bg-opacity-10 p-3 me-3" style="background-color: #20c997;">
+                    <i class="bi bi-cash-stack fs-3 text-teal" style="color: #20c997;"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Sponsor ROI</h6>
+                    <h3 class="mb-0">{{ sponsor_roi|default(0) }}%</h3>
+                    <small class="text-muted">{{ sponsor_count|default(0) }} active sponsors</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="rounded-circle bg-secondary bg-opacity-10 p-3 me-3">
+                    <i class="bi bi-check-circle fs-3 text-secondary"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Task Completion</h6>
+                    <h3 class="mb-0">{{ task_completion|default(0) }}%</h3>
+                    <small class="text-muted">{{ tasks_completed|default(0) }}/{{ tasks_total|default(0) }} done</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-4 mb-4">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-bar-chart-fill"></i> Agent Performance Scores</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="agentBarChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Health Trend (7 days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="healthTrendChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agent Table + Radar -->
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-table"></i> Agent Status Details</h5>
+                <span class="badge bg-primary rounded-pill">{{ agents|length|default(0) }} agents</span>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Agent</th>
+                            <th>Status</th>
+                            <th>Score</th>
+                            <th>Tasks</th>
+                            <th>Success Rate</th>
+                            <th>Last Activity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for agent in agents %}
+                        <tr>
+                            <td><strong>{{ agent.name }}</strong></td>
+                            <td>
+                                <span class="badge {% if agent.status == 'active' %}bg-success{% elif agent.status == 'idle' %}bg-secondary{% else %}bg-danger{% endif %}">
+                                    {{ agent.status|capitalize }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="progress" style="height:20px; width:100px;">
+                                    <div class="progress-bar {% if agent.score >= 70 %}bg-success{% elif agent.score >= 40 %}bg-warning{% else %}bg-danger{% endif %}"
+                                         role="progressbar"
+                                         style="width: {{ agent.score }}%;"
+                                         aria-valuenow="{{ agent.score }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                        {{ agent.score }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ agent.tasks_processed|default(0) }}</td>
+                            <td>{{ agent.success_rate|default(0) }}%</td>
+                            <td><small class="text-muted">{{ agent.last_activity|default('N/A') }}</small></td>
+                            <td>
+                                <!-- FIX: Use a data attribute to store agent JSON, then trigger modal via JavaScript -->
+                                <button class="btn btn-sm btn-outline-primary view-agent-btn"
+                                        data-agent='{{ agent|tojson|safe }}'
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#agentModal">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0"><i class="bi bi-radar"></i> Radar Overview</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="agentRadarChart" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Agent Detail Modal -->
+<div class="modal fade" id="agentModal" tabindex="-1" aria-labelledby="agentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agentModalLabel">Agent Details: <span id="modalAgentName"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> <span id="modalStatus" class="badge"></span></p>
+                        <p><strong>Performance Score:</strong> <span id="modalScore"></span>%</p>
+                        <p><strong>Tasks Processed:</strong> <span id="modalTasks"></span></p>
+                        <p><strong>Success Rate:</strong> <span id="modalSuccess"></span>%</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Last Activity:</strong> <span id="modalLastActivity"></span></p>
+                        <p><strong>Uptime:</strong> <span id="modalUptime"></span></p>
+                        <p><strong>Memory Usage:</strong> <span id="modalMemory"></span></p>
+                        <p><strong>CPU Load:</strong> <span id="modalCPU"></span></p>
+                    </div>
+                    <div class="col-12">
+                        <h6>Recent Logs</h6>
+                        <ul class="list-group" id="modalLogs">
+                            <li class="list-group-item text-muted">Select an agent to view logs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-primary" onclick="alert('Restarting agent...')"><i class="bi bi-arrow-repeat"></i> Restart Agent</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ---- Charts ----
+        const agentData = {{ agent_scores|tojson }};
+        const agentNames = Object.keys(agentData);
+        const agentScores = Object.values(agentData);
+
+        // Bar Chart
+        const barCtx = document.getElementById('agentBarChart').getContext('2d');
+        const barColors = agentScores.map(score =>
+            score >= 70 ? 'rgba(40, 167, 69, 0.8)' :
+            score >= 40 ? 'rgba(255, 193, 7, 0.8)' :
+            'rgba(220, 53, 69, 0.8)'
+        );
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: agentNames,
+                datasets: [{
+                    label: 'Performance Score (%)',
+                    data: agentScores,
+                    backgroundColor: barColors,
+                    borderColor: barColors.map(c => c.replace('0.8', '1')),
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { callback: function(v) { return v + '%'; } }
+                    }
+                }
+            }
+        });
+
+        // Radar Chart
+        const radarCtx = document.getElementById('agentRadarChart').getContext('2d');
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: agentNames,
+                datasets: [{
+                    label: 'Performance',
+                    data: agentScores,
+                    backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                    borderColor: '#0d6efd',
+                    pointBackgroundColor: '#0d6efd',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: { stepSize: 20, callback: function(v) { return v + '%'; } }
+                    }
+                }
+            }
+        });
+
+        // Health Trend
+        const trendData = {{ health_trend|tojson }};
+        if (trendData && trendData.labels && trendData.values) {
+            const trendCtx = document.getElementById('healthTrendChart').getContext('2d');
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: trendData.labels,
+                    datasets: [{
+                        label: 'Health Score (%)',
+                        data: trendData.values,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#0d6efd'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { callback: function(v) { return v + '%'; } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ---- Modal handler using data attribute ----
+        document.querySelectorAll('.view-agent-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                try {
+                    const agent = JSON.parse(this.getAttribute('data-agent'));
+                    console.log('Agent data:', agent);
+                    loadAgentDetail(agent);
+                } catch (e) {
+                    console.error('Error parsing agent data:', e);
+                    // Fallback: try to use the raw data
+                    const raw = this.getAttribute('data-agent');
+                    console.log('Raw data:', raw);
+                }
+            });
+        });
+    });
+
+    function loadAgentDetail(agent) {
+        // Populate modal fields with fallback values
+        document.getElementById('modalAgentName').textContent = agent.name || 'Unknown';
+
+        const statusEl = document.getElementById('modalStatus');
+        const status = agent.status || 'unknown';
+        statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+        statusEl.className = 'badge bg-' + (status === 'active' ? 'success' : status === 'idle' ? 'secondary' : 'danger');
+
+        document.getElementById('modalScore').textContent = agent.score || 0;
+        document.getElementById('modalTasks').textContent = agent.tasks_processed || 0;
+        document.getElementById('modalSuccess').textContent = agent.success_rate || 0;
+        document.getElementById('modalLastActivity').textContent = agent.last_activity || 'N/A';
+        document.getElementById('modalUptime').textContent = agent.uptime || 'N/A';
+        document.getElementById('modalMemory').textContent = agent.memory || 'N/A';
+        document.getElementById('modalCPU').textContent = agent.cpu || 'N/A';
+
+        // Simulated logs
+        const logs = [
+            `2026-06-27 10:32:45 - ${agent.name} processed task #1245`,
+            `2026-06-27 10:30:12 - Health check passed`,
+            `2026-06-27 10:28:03 - Updated configuration`,
+            `2026-06-27 10:25:00 - Successfully completed batch`
+        ];
+        const logList = document.getElementById('modalLogs');
+        logList.innerHTML = logs.map(log => `<li class="list-group-item"><code>${log}</code></li>`).join('');
+    }
+
+    function refreshData() {
+        location.reload();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}Register — EventOps AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ---- Page background & card styling ---- */
+    .register-wrapper {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #f0f4ff 0%, #e6edf7 100%);
+        padding: 2rem 0;
+    }
+    .register-card {
+        border: none;
+        border-radius: 2rem;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 60px rgba(13, 110, 253, 0.15);
+        transition: transform 0.3s ease;
+        overflow: hidden;
+    }
+    .register-card:hover {
+        transform: translateY(-5px);
+    }
+    .register-card .card-header {
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+        text-align: center;
+    }
+    .register-card .card-header h3 {
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .register-card .card-header i {
+        font-size: 2.5rem;
+        margin-bottom: 0.3rem;
+    }
+    .register-card .card-body {
+        padding: 2.5rem 2.5rem;
+    }
+
+    /* ---- Form fields ---- */
+    .form-floating {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    .form-floating > .form-control,
+    .form-floating > .form-select {
+        border-radius: 1rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.2s ease;
+        background: #f8f9fa;
+    }
+    .form-floating > .form-control:focus,
+    .form-floating > .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        background: white;
+    }
+    .form-floating > label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    /* ---- Password toggle eye ---- */
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        z-index: 10;
+        color: #6c757d;
+        background: transparent;
+        border: none;
+        padding: 0;
+        font-size: 1.2rem;
+        transition: color 0.2s ease;
+    }
+    .password-toggle:hover {
+        color: #0d6efd;
+    }
+
+    /* ---- Password strength meter ---- */
+    .password-strength {
+        height: 6px;
+        border-radius: 10px;
+        background: #e9ecef;
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+    .password-strength .progress-bar {
+        height: 100%;
+        width: 0%;
+        border-radius: 10px;
+        transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    /* ---- Role selection badges ---- */
+    .role-option {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        border: 2px solid #e9ecef;
+        border-radius: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 0.5rem;
+        background: #f8f9fa;
+    }
+    .role-option:hover {
+        border-color: #0d6efd;
+        background: #e7f0ff;
+    }
+    .role-option input[type="radio"] {
+        display: none;
+    }
+    .role-option.active {
+        border-color: #0d6efd;
+        background: #e7f0ff;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+    }
+    .role-option .role-icon {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        width: 2.5rem;
+        text-align: center;
+    }
+    .role-option .role-info {
+        flex: 1;
+    }
+    .role-option .role-info .role-title {
+        font-weight: 600;
+        margin-bottom: 0.1rem;
+    }
+    .role-option .role-info .role-desc {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    /* ---- Submit button ---- */
+    .btn-register {
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        background: linear-gradient(135deg, #0d6efd, #6610f2);
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1.1rem;
+    }
+    .btn-register:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(13, 110, 253, 0.3);
+        background: linear-gradient(135deg, #0b5ed7, #5a0fc7);
+        color: white;
+    }
+
+    /* ---- Demo hint ---- */
+    .demo-hint {
+        background: #f1f4f9;
+        border-radius: 1rem;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+        color: #495057;
+        border-left: 4px solid #0d6efd;
+    }
+    .demo-hint strong {
+        color: #0d6efd;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 576px) {
+        .register-card .card-body {
+            padding: 1.5rem;
+        }
+        .role-option .role-desc {
+            display: none;
+        }
+    }
+
+    /* ---- Custom invalid feedback for confirm password ---- */
+    .confirm-feedback {
+        display: none;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+    .confirm-feedback.show {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-wrapper">
+    <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="card register-card">
+            <!-- Header -->
+            <div class="card-header">
+                <i class="bi bi-person-plus"></i>
+                <h3>Create Your Account</h3>
+                <p class="mb-0" style="opacity:0.85;">Join the future of event management</p>
+            </div>
+            <!-- Body -->
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('register') }}" id="registerForm" novalidate>
+                    <!-- Full Name -->
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="name" name="name"
+                               placeholder="Full Name" required>
+                        <label for="name"><i class="bi bi-person-fill me-2"></i>Full Name</label>
+                        <div class="invalid-feedback">Please enter your full name.</div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" name="email"
+                               placeholder="Email Address" required>
+                        <label for="email"><i class="bi bi-envelope-fill me-2"></i>Email Address</label>
+                        <div class="invalid-feedback">Please enter a valid email.</div>
+                    </div>
+
+                    <!-- Password (with toggle eye) -->
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="Password" required minlength="8">
+                        <label for="password"><i class="bi bi-lock-fill me-2"></i>Password</label>
+                        <i class="bi bi-eye-slash password-toggle" id="togglePassword"></i>
+                        <div class="invalid-feedback">Password must be at least 8 characters.</div>
+                        <!-- Password strength meter -->
+                        <div class="password-strength mt-2">
+                            <div class="progress-bar" id="passwordStrengthBar" role="progressbar"></div>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mt-1">
+                            <span>Weak</span>
+                            <span>Medium</span>
+                            <span>Strong</span>
+                        </div>
+                        <div id="passwordHelp" class="form-text">
+                            <i class="bi bi-info-circle"></i> At least 8 characters, mix of letters, numbers, and symbols.
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password (with toggle eye) -->
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="confirmPassword" name="confirm_password"
+                               placeholder="Confirm Password" required>
+                        <label for="confirmPassword"><i class="bi bi-check-circle me-2"></i>Confirm Password</label>
+                        <i class="bi bi-eye-slash password-toggle" id="toggleConfirmPassword"></i>
+                        <div class="invalid-feedback">Please confirm your password.</div>
+                        <div class="confirm-feedback" id="confirmFeedback">Passwords do not match.</div>
+                    </div>
+
+                    <!-- Role Selection (with visual cards) -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold"><i class="bi bi-person-badge me-2"></i>Select Role</label>
+                        <div class="role-option active" data-role="user">
+                            <input type="radio" name="role" value="user" checked>
+                            <div class="role-icon"><i class="bi bi-person"></i></div>
+                            <div class="role-info">
+                                <div class="role-title">User</div>
+                                <div class="role-desc">Regular attendee – browse events, register, track your participation</div>
+                            </div>
+                        </div>
+                        <div class="role-option" data-role="admin">
+                            <input type="radio" name="role" value="admin">
+                            <div class="role-icon"><i class="bi bi-shield-lock"></i></div>
+                            <div class="role-info">
+                                <div class="role-title">Admin</div>
+                                <div class="role-desc">Full platform control – manage events, users, venues, sponsors, and more</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-register">
+                        <i class="bi bi-check-circle me-2"></i> Register Now
+                    </button>
+                </form>
+
+                <!-- Login link -->
+                <div class="text-center mt-3">
+                    <p class="text-muted">Already have an account? <a href="{{ url_for('login') }}" class="fw-bold text-primary">Login</a></p>
+                </div>
+
+                <!-- Demo hint -->
+                <div class="demo-hint">
+                    <i class="bi bi-info-circle-fill me-2 text-primary"></i>
+                    <strong>Demo credentials:</strong><br>
+                    Admin: <code>admin@eventops.com</code> / <code>admin123</code><br>
+                    User:  <code>user@eventops.com</code> / <code>user123</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        'use strict';
+
+        // ---- Role selection toggle ----
+        const roleOptions = document.querySelectorAll('.role-option');
+        roleOptions.forEach(opt => {
+            opt.addEventListener('click', function(e) {
+                roleOptions.forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) radio.checked = true;
+            });
+        });
+
+        // ---- Toggle Password Visibility ----
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+
+        // ---- Toggle Confirm Password Visibility ----
+        const toggleConfirm = document.getElementById('toggleConfirmPassword');
+        const confirm = document.getElementById('confirmPassword');
+
+        toggleConfirm.addEventListener('click', function() {
+            const type = confirm.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirm.setAttribute('type', type);
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+
+        // ---- Password strength meter ----
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('passwordStrengthBar');
+
+        passwordInput.addEventListener('input', function() {
+            const val = this.value;
+            let strength = 0;
+            if (val.length >= 8) strength += 1;
+            if (/[a-z]/.test(val) && /[A-Z]/.test(val)) strength += 1;
+            if (/\d/.test(val)) strength += 1;
+            if (/[^a-zA-Z0-9]/.test(val)) strength += 1;
+
+            let width = 0;
+            let color = '#dc3545';
+            if (strength >= 4) { width = 100; color = '#198754'; }
+            else if (strength === 3) { width = 75; color = '#ffc107'; }
+            else if (strength === 2) { width = 50; color = '#fd7e14'; }
+            else if (strength >= 1) { width = 25; color = '#dc3545'; }
+
+            strengthBar.style.width = width + '%';
+            strengthBar.style.background = color;
+
+            // Also trigger confirm password check when password changes
+            checkPasswordMatch();
+        });
+
+        // ---- Confirm password matching ----
+        const confirmInput = document.getElementById('confirmPassword');
+        const confirmFeedback = document.getElementById('confirmFeedback');
+
+        function checkPasswordMatch() {
+            const pass = passwordInput.value;
+            const confirmVal = confirmInput.value;
+            if (confirmVal === '') {
+                confirmFeedback.classList.remove('show');
+                confirmInput.setCustomValidity('');
+                return;
+            }
+            if (pass !== confirmVal) {
+                confirmFeedback.classList.add('show');
+                confirmInput.setCustomValidity('Passwords do not match.');
+            } else {
+                confirmFeedback.classList.remove('show');
+                confirmInput.setCustomValidity('');
+            }
+        }
+
+        confirmInput.addEventListener('input', checkPasswordMatch);
+
+        // ---- Bootstrap form validation ----
+        const form = document.getElementById('registerForm');
+        form.addEventListener('submit', function(event) {
+            checkPasswordMatch();
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+
+    })();
+</script>
+{% endblock %}
